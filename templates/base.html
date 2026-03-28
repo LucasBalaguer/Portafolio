@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Lucas Balaguer{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body class="{% if request.endpoint == 'home' %}home{% endif %}">
+
+<header class="main-header">
+    <nav class="nav-centered" aria-label="Navegación principal">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('projects') }}">Proyectos</a>
+        <a href="{{ url_for('skills') }}">Skills</a>
+        <a href="{{ url_for('contacto') }}">Contacto</a>
+    </nav>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+    <div class="flash-messages">
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+         {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- TOGGLE DARK MODE -->
+<button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">
+    <span class="toggle-icon sun">☀</span>
+    <span class="toggle-icon moon">🌙</span>
+</button>
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+<script src="{{ url_for('static', filename='js/glass.js') }}"></script>
+<script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tilt.js') }}"></script>
+
+
+</body>
+</html>

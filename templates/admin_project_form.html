@@ -1,0 +1,29 @@
+<h2>{{ action }} Proyecto</h2>
+
+<form method="POST">
+
+    <input type="text" name="title" placeholder="Título"
+           value="{{ project.title if project else '' }}" required>
+
+    <textarea name="description" placeholder="Descripción" required>{{ project.description if project else '' }}</textarea>
+
+    <input type="text" name="slug" placeholder="Slug (ej: mi-proyecto)"
+           value="{{ project.slug if project else '' }}" required>
+
+    <input type="text" name="role" placeholder="Rol (ej: Data Analyst)"
+           value="{{ project.role if project else '' }}">
+
+    <input type="text" name="tech" placeholder="Tecnologías (ej: Python, Pandas, Scikit-learn)"
+           value="{{ project.tech if project else '' }}">
+
+    <input type="text" name="duration" placeholder="Duración (ej: 2 semanas)"
+           value="{{ project.duration if project else '' }}">
+
+    <input type="url" name="github" placeholder="GitHub Link"
+           value="{{ project.github if project else '' }}">
+
+    <button type="submit">{{ action }}</button>
+
+</form>
+
+<a href="{{ url_for('admin_dashboard') }}">Volver</a>

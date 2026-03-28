@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel · Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #07070d;
+            --surface: #0f0f18;
+            --surface2: #14141f;
+            --border: #1a1a28;
+            --border2: #222235;
+            --accent: #7c6af7;
+            --accent2: #4ecca3;
+            --accent3: #f05e7a;
+            --text: #e2e2f0;
+            --muted: #50507a;
+            --muted2: #7070a0;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Sora', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,106,247,0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ---- TOPBAR ---- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7,7,13,0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            height: 56px;
+        }
+
+        .topbar-brand {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-dot {
+            width: 7px; height: 7px;
+            background: var(--accent2);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topbar-actions a {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--muted2);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        .topbar-actions a:hover { color: var(--text); }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            color: var(--muted2) !important;
+            padding: 0.3rem 0.75rem;
+            transition: border-color 0.2s, color 0.2s !important;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--accent3) !important;
+            color: var(--accent3) !important;
+        }
+
+        /* ---- LAYOUT ---- */
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ---- STAT CARDS ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            transition: border-color 0.2s;
+        }
+
+        .stat-card:hover { border-color: var(--border2); }
+
+        .stat-label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stat-value.accent { color: var(--accent); }
+        .stat-value.green { color: var(--accent2); }
+
+        .stat-sub {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--muted2);
+            margin-top: 0.4rem;
+        }
+
+        /* ---- CHARTS ROW ---- */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .chart-title {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--muted2);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.25rem;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 180px;
+        }
+
+        /* ---- TABLES ---- */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .tables-grid { grid-template-columns: 1fr; }
+        }
+
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .table-card table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+        }
+
+        .table-card th {
+            text-align: left;
+            color: var(--muted);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-card td {
+            padding: 0.6rem 0;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-card tr:last-child td { border-bottom: none; }
+
+        .table-card td:last-child {
+            text-align: right;
+            color: var(--accent);
+        }
+
+        .bar-inline {
+            display: inline-block;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            opacity: 0.4;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* ---- PROJECTS TABLE ---- */
+        .projects-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .projects-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .btn-new {
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            letter-spacing: 0.04em;
+            transition: opacity 0.2s;
+        }
+
+        .btn-new:hover { opacity: 0.85; }
+
+        .projects-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .projects-table th {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            text-align: left;
+            padding: 0 0 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .projects-table td {
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .projects-table tr:last-child td { border-bottom: none; }
+
+        .project-title-cell { font-weight: 600; }
+
+        .tech-pill {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            color: var(--muted2);
+        }
+
+        .action-links {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .action-links a {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--muted2);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .action-links a:hover { color: var(--accent); }
+
+        .action-links button {
+            background: none;
+            border: none;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--muted2);
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .action-links button:hover { color: var(--accent3); }
+
+        /* ---- FLASH ---- */
+        .flash {
+            background: rgba(78, 204, 163, 0.1);
+            border: 1px solid rgba(78, 204, 163, 0.3);
+            border-radius: 8px;
+            color: var(--accent2);
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            padding: 0.6rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-align: center;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+    <div class="topbar-brand">
+        <span class="live-dot"></span>
+        PANEL · LUCAS BALAGUER
+    </div>
+    <div class="topbar-actions">
+        <a href="{{ url_for('home') }}" target="_blank">Ver web →</a>
+        <a href="{{ url_for('panel_logout', token=token) }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</header>
+
+<main class="page">
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+            <div class="flash">✓ {{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- ===== ESTADÍSTICAS ===== -->
+    <p class="section-title">Estadísticas · últimos 30 días</p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Visitantes únicos (total)</div>
+            <div class="stat-value accent">{{ total_unique }}</div>
+            <div class="stat-sub">desde el inicio</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Visitantes únicos</div>
+            <div class="stat-value green">{{ unique_30d }}</div>
+            <div class="stat-sub">últimos 30 días</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Páginas rastreadas</div>
+            <div class="stat-value">{{ visits_by_page | length }}</div>
+            <div class="stat-sub">con actividad reciente</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Proyectos activos</div>
+            <div class="stat-value">{{ projects | length }}</div>
+            <div class="stat-sub">en base de datos</div>
+        </div>
+    </div>
+
+    <!-- ===== GRÁFICOS ===== -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-title">Visitantes únicos · últimos 14 días</div>
+            <div class="chart-wrap">
+                <canvas id="dailyChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">Dispositivos</div>
+            <div class="chart-wrap">
+                <canvas id="deviceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TABLAS DETALLE ===== -->
+    <div class="tables-grid">
+        <div class="table-card">
+            <div class="chart-title">Visitas por página</div>
+            {% if visits_by_page %}
+            {% set max_v = visits_by_page[0].unique_visitors %}
+            <table>
+                <thead><tr><th>Página</th><th>Visitantes únicos</th></tr></thead>
+                <tbody>
+                {% for row in visits_by_page %}
+                <tr>
+                    <td>
+                        <span class="bar-inline"
+                              style="width:{{ (row.unique_visitors / max_v * 80) | int }}px"></span>
+                        /{{ row.page }}
+                    </td>
+                    <td>{{ row.unique_visitors }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="empty-state">Sin datos todavía</p>
+            {% endif %}
+        </div>
+
+        <div class="table-card">
+            <div class="chart-title">Idiomas del navegador</div>
+            {% if top_languages %}
+            <table>
+                <thead><tr><th>Idioma</th><th>Visitas</th></tr></thead>
+                <tbody>
+                {% for lang, total in top_languages %}
+                <tr>
+                    <td>{{ lang[:30] if lang else 'Desconocido' }}</td>
+                    <td>{{ total }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="empty-state">Sin datos todavía</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ===== PROYECTOS ===== -->
+    <div class="projects-section">
+        <div class="projects-header">
+            <p class="section-title" style="margin:0;border:none;">Gestión de proyectos</p>
+            <a href="{{ url_for('panel_create_project', token=token) }}" class="btn-new">+ Nuevo proyecto</a>
+        </div>
+
+        {% if projects %}
+        <table class="projects-table">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Tecnologías</th>
+                    <th>Slug</th>
+                    <th style="text-align:right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for project in projects %}
+            <tr>
+                <td class="project-title-cell">{{ project.title }}</td>
+                <td><span class="tech-pill">{{ project.tech[:40] if project.tech else '—' }}</span></td>
+                <td style="font-family:var(--mono);font-size:0.72rem;color:var(--muted2)">{{ project.slug }}</td>
+                <td>
+                    <div class="action-links">
+                        <a href="{{ url_for('panel_edit_project', token=token, id=project.id) }}">Editar</a>
+                        <form action="{{ url_for('panel_delete_project', token=token, id=project.id) }}"
+                              method="POST" style="display:inline"
+                              onsubmit="return confirm('¿Eliminar {{ project.title }}?')">
+                            <button type="submit">Eliminar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No hay proyectos todavía. ¡Añade el primero!</p>
+        {% endif %}
+    </div>
+
+</main>
+
+<!-- CHARTS JS -->
+<script>
+const accentColor = '#7c6af7';
+const greenColor  = '#4ecca3';
+const gridColor   = 'rgba(255,255,255,0.04)';
+const textColor   = '#50507a';
+
+Chart.defaults.color = textColor;
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 11;
+
+// --- Daily visits ---
+const dailyLabels = [
+    {% for row in daily_visits %}
+    "{{ row.visit_date.strftime('%d/%m') }}",
+    {% endfor %}
+];
+const dailyData = [
+    {% for row in daily_visits %}
+    {{ row.unique_visitors }},
+    {% endfor %}
+];
+
+new Chart(document.getElementById('dailyChart'), {
+    type: 'line',
+    data: {
+        labels: dailyLabels,
+        datasets: [{
+            data: dailyData,
+            borderColor: accentColor,
+            backgroundColor: 'rgba(124,106,247,0.08)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: accentColor,
+            tension: 0.4,
+            fill: true,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: gridColor }, ticks: { maxRotation: 0 } },
+            y: { grid: { color: gridColor }, beginAtZero: true, ticks: { precision: 0 } }
+        }
+    }
+});
+
+// --- Device chart ---
+const deviceLabels = [
+    {% for row in devices %}"{{ row.device | capitalize }}",{% endfor %}
+];
+const deviceData = [
+    {% for row in devices %}{{ row.total }},{% endfor %}
+];
+
+new Chart(document.getElementById('deviceChart'), {
+    type: 'doughnut',
+    data: {
+        labels: deviceLabels,
+        datasets: [{
+            data: deviceData,
+            backgroundColor: [accentColor, greenColor, '#f05e7a'],
+            borderWidth: 0,
+            hoverOffset: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { padding: 16, boxWidth: 10 }
+            }
+        },
+        cutout: '65%',
+    }
+});
+</script>
+
+</body>
+</html>

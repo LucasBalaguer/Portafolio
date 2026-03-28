@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+Lucas Balaguer | Analista de Datos
+{% endblock %}
+
+{% block content %}
+
+<section class="hero-centered">
+
+    <div class="hero-glass">
+
+        <span class="hero-kicker">HOLA, SOY</span>
+
+        <h1>Lucas Balaguer</h1>
+        <h2>Analista de Datos</h2>
+
+        <p>
+            Transformo datos en información clara para apoyar la
+            toma de decisiones con Python y Machine Learning.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ url_for('projects') }}" class="btn-primary">
+                Ver proyectos
+            </a>
+
+            <a href="{{ url_for('contacto') }}" class="btn-secondary">
+                Contactar
+            </a>
+        </div>
+
+    </div>
+
+    <!-- PROYECTOS RECIENTES -->
+    <div class="projects-floating">
+
+        <span class="projects-label">Proyectos recientes</span>
+
+        <div class="projects-mini-grid">
+
+            <a href="{{ url_for('projects') }}" class="mini-project">
+                Vinos<br>ML
+            </a>
+
+            <a href="{{ url_for('projects') }}" class="mini-project">
+                Inmobiliario<br>EDA
+            </a>
+
+            <a href="{{ url_for('projects') }}" class="mini-project">
+                Precios<br>Regresión
+            </a>
+
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

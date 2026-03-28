@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}
+Proyecto | {{ project.title }}
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="project-hero">
+    {% if project.tech %}
+    <span class="project-tag">
+        {{ project.tech }}
+    </span>
+    {% endif %}
+
+    <h1>{{ project.title }}</h1>
+
+    <p class="project-intro">
+        {{ project.description }}
+    </p>
+</section>
+
+<!-- META INFO -->
+<section class="project-meta">
+    <div class="meta-item">
+        <span class="meta-label">Rol</span>
+        <span>{{ project.role }}</span>
+    </div>
+
+    <div class="meta-item">
+        <span class="meta-label">Tecnologías</span>
+        <span>{{ project.tech }}</span>
+    </div>
+
+    <div class="meta-item">
+        <span class="meta-label">Duración</span>
+        <span>{{ project.duration }}</span>
+    </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="project-section">
+    <h2>El problema</h2>
+    <p>
+        El objetivo era comprender qué factores influyen más en el problema
+        y desarrollar una solución basada en datos que aportase valor real.
+    </p>
+</section>
+
+<!-- PROCESO -->
+<section class="project-section glass-card">
+    <h2>Proceso</h2>
+    <ul class="process-list">
+        <li>Análisis exploratorio de datos (EDA)</li>
+        <li>Limpieza y preparación de los datos</li>
+        <li>Selección de variables relevantes</li>
+        <li>Modelado y evaluación de resultados</li>
+    </ul>
+</section>
+
+<!-- RESULTADOS -->
+<section class="project-section">
+    <h2>Resultados</h2>
+    <p>
+        El análisis permitió extraer insights relevantes y construir una
+        solución sólida, manteniendo un equilibrio entre rendimiento
+        e interpretabilidad.
+    </p>
+</section>
+
+<!-- ACCIONES -->
+<section class="project-actions">
+    {% if project.github %}
+    <a href="{{ project.github }}" target="_blank" class="btn-primary">
+        Ver código en GitHub
+    </a>
+    {% endif %}
+
+    <a href="{{ url_for('projects') }}" class="btn-secondary">
+        Volver a proyectos
+    </a>
+</section>
+
+<!-- NAVEGACIÓN ENTRE PROYECTOS -->
+<nav class="project-nav">
+
+    {% if prev_project %}
+    <a href="{{ url_for('project_detail', slug=prev_project.slug) }}"
+       class="project-nav-item prev">
+        <span class="nav-label">Proyecto anterior</span>
+        <span class="nav-title">{{ prev_project.title }}</span>
+    </a>
+    {% endif %}
+
+    {% if next_project %}
+    <a href="{{ url_for('project_detail', slug=next_project.slug) }}"
+       class="project-nav-item next">
+        <span class="nav-label">Siguiente proyecto</span>
+        <span class="nav-title">{{ next_project.title }}</span>
+    </a>
+    {% endif %}
+
+</nav>
+
+{% endblock %}

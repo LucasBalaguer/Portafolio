@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: lucas-balaguer-portfolio
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PANEL_TOKEN
+        sync: false
+      - key: PANEL_PASSWORD
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.0

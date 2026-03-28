@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel · {{ action }} Proyecto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #07070d;
+            --surface: #0f0f18;
+            --border: #1a1a28;
+            --border2: #222235;
+            --accent: #7c6af7;
+            --accent-dim: rgba(124,106,247,0.12);
+            --text: #e2e2f0;
+            --muted: #50507a;
+            --muted2: #7070a0;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Sora', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1rem;
+        }
+
+        .form-card {
+            width: 100%;
+            max-width: 600px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2.5rem 2rem;
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .back-link {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--muted2);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--text); }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.5rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .hint {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--muted);
+            margin-top: 0.35rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .btn-submit {
+            flex: 1;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.85rem;
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:hover { opacity: 0.87; }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: 0.85rem 1.5rem;
+            color: var(--muted2);
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-cancel:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{{ action }} proyecto</h1>
+            <a href="{{ url_for('panel_dashboard', token=token) }}" class="back-link">← Volver al panel</a>
+        </div>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Título *</label>
+                <input type="text" id="title" name="title"
+                       value="{{ project.title if project else '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descripción *</label>
+                <textarea id="description" name="description" required>{{ project.description if project else '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="slug">Slug *</label>
+                <input type="text" id="slug" name="slug"
+                       value="{{ project.slug if project else '' }}" required>
+                <p class="hint">Solo minúsculas, números y guiones. Ej: mi-proyecto-eda</p>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Rol</label>
+                <input type="text" id="role" name="role"
+                       value="{{ project.role if project else '' }}"
+                       placeholder="Ej: Data Analyst">
+            </div>
+
+            <div class="form-group">
+                <label for="tech">Tecnologías</label>
+                <input type="text" id="tech" name="tech"
+                       value="{{ project.tech if project else '' }}"
+                       placeholder="Ej: Python, Pandas, Scikit-learn">
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Duración</label>
+                <input type="text" id="duration" name="duration"
+                       value="{{ project.duration if project else '' }}"
+                       placeholder="Ej: 3 semanas">
+            </div>
+
+            <div class="form-group">
+                <label for="github">GitHub URL</label>
+                <input type="url" id="github" name="github"
+                       value="{{ project.github if project else '' }}"
+                       placeholder="https://github.com/...">
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ url_for('panel_dashboard', token=token) }}" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-submit">{{ action }} proyecto</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
