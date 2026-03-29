@@ -17,10 +17,23 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 # ----------------------------
 # CONFIGURACIÓN BASE DE DATOS
+# En local → SQLite | En producción → Supabase (PostgreSQL)
 # ----------------------------
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///projects.db"
+db_url = os.getenv("DATABASE_URL", "sqlite:///projects.db")
+
+# Supabase devuelve "postgres://", SQLAlchemy necesita "postgresql://"
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Evita timeouts en conexiones PostgreSQL de larga duración
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
 
 db = SQLAlchemy(app)
 
@@ -44,7 +57,6 @@ class Project(db.Model):
 
 
 class PageVisit(db.Model):
-    """Registra cada visita única por IP + página + día."""
     id = db.Column(db.Integer, primary_key=True)
     page = db.Column(db.String(200), nullable=False)
     ip_hash = db.Column(db.String(64), nullable=False)
@@ -96,7 +108,6 @@ def _detect_device(ua: str) -> str:
 
 
 def track_visit(page: str):
-    """Registra una visita única por IP + página + día."""
     try:
         ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown")
         ip = ip.split(",")[0].strip()
@@ -113,15 +124,13 @@ def track_visit(page: str):
             ua = request.headers.get("User-Agent", "")
             lang = request.headers.get("Accept-Language", "")[:50]
             device = _detect_device(ua)
-
-            visit = PageVisit(
+            db.session.add(PageVisit(
                 page=page,
                 ip_hash=ip_hash,
                 language=lang,
                 device=device,
                 visit_date=today,
-            )
-            db.session.add(visit)
+            ))
             db.session.commit()
     except Exception:
         db.session.rollback()
@@ -179,14 +188,13 @@ def contacto():
 
 
 # ----------------------------
-# RUTAS ADMIN (compatibilidad)
+# RUTAS ADMIN
 # ----------------------------
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        password = request.form.get("password")
-        if password == os.getenv("ADMIN_PASSWORD"):
+        if request.form.get("password") == os.getenv("ADMIN_PASSWORD"):
             session["admin"] = True
             return redirect(url_for("admin_dashboard"))
     return render_template("admin_login.html")
@@ -201,15 +209,14 @@ def admin_logout():
 @app.route("/admin/dashboard")
 @admin_required
 def admin_dashboard():
-    all_projects = Project.query.all()
-    return render_template("admin_dashboard.html", projects=all_projects)
+    return render_template("admin_dashboard.html", projects=Project.query.all())
 
 
 @app.route("/admin/project/new", methods=["GET", "POST"])
 @admin_required
 def admin_create_project():
     if request.method == "POST":
-        new_project = Project(
+        db.session.add(Project(
             title=request.form.get("title"),
             description=request.form.get("description"),
             slug=request.form.get("slug"),
@@ -217,8 +224,7 @@ def admin_create_project():
             tech=request.form.get("tech"),
             duration=request.form.get("duration"),
             github=request.form.get("github")
-        )
-        db.session.add(new_project)
+        ))
         db.session.commit()
         flash("Proyecto creado correctamente")
         return redirect(url_for("admin_dashboard"))
@@ -254,7 +260,7 @@ def admin_delete_project(id):
 
 
 # ============================================================
-# PANEL PRIVADO — URL secreta + contraseña
+# PANEL PRIVADO
 # ============================================================
 
 PANEL_TOKEN = os.getenv("PANEL_TOKEN")
@@ -269,15 +275,12 @@ def _validate_token(token: str) -> bool:
 def panel_login(token):
     if not _validate_token(token):
         abort(404)
-
     if request.method == "POST":
-        password = request.form.get("password")
-        if password == PANEL_PASSWORD:
+        if request.form.get("password") == PANEL_PASSWORD:
             session["panel"] = True
             session["panel_token"] = token
             return redirect(url_for("panel_dashboard", token=token))
         flash("Contraseña incorrecta")
-
     return render_template("panel_login.html", token=token)
 
 
@@ -300,7 +303,6 @@ def panel_dashboard(token):
     last_30 = today - timedelta(days=30)
 
     total_unique = db.session.query(PageVisit.ip_hash).distinct().count()
-
     unique_30d = db.session.query(PageVisit.ip_hash).filter(
         PageVisit.visit_date >= last_30
     ).distinct().count()
@@ -308,27 +310,21 @@ def panel_dashboard(token):
     visits_by_page = db.session.query(
         PageVisit.page,
         func.count(PageVisit.ip_hash.distinct()).label("unique_visitors")
-    ).filter(
-        PageVisit.visit_date >= last_30
-    ).group_by(PageVisit.page).order_by(
+    ).filter(PageVisit.visit_date >= last_30).group_by(PageVisit.page).order_by(
         func.count(PageVisit.ip_hash.distinct()).desc()
     ).all()
 
     top_languages = db.session.query(
         PageVisit.language,
         func.count().label("total")
-    ).filter(
-        PageVisit.visit_date >= last_30
-    ).group_by(PageVisit.language).order_by(
-        func.count().desc()
-    ).limit(5).all()
+    ).filter(PageVisit.visit_date >= last_30).group_by(
+        PageVisit.language
+    ).order_by(func.count().desc()).limit(5).all()
 
     devices = db.session.query(
         PageVisit.device,
         func.count().label("total")
-    ).filter(
-        PageVisit.visit_date >= last_30
-    ).group_by(PageVisit.device).all()
+    ).filter(PageVisit.visit_date >= last_30).group_by(PageVisit.device).all()
 
     daily_visits = db.session.query(
         PageVisit.visit_date,
@@ -336,8 +332,6 @@ def panel_dashboard(token):
     ).filter(
         PageVisit.visit_date >= today - timedelta(days=13)
     ).group_by(PageVisit.visit_date).order_by(PageVisit.visit_date).all()
-
-    all_projects = Project.query.all()
 
     return render_template(
         "panel_dashboard.html",
@@ -348,7 +342,7 @@ def panel_dashboard(token):
         top_languages=top_languages,
         devices=devices,
         daily_visits=daily_visits,
-        projects=all_projects,
+        projects=Project.query.all(),
     )
 
 
@@ -358,7 +352,7 @@ def panel_create_project(token):
     if not _validate_token(token):
         abort(404)
     if request.method == "POST":
-        new_project = Project(
+        db.session.add(Project(
             title=request.form.get("title"),
             description=request.form.get("description"),
             slug=request.form.get("slug"),
@@ -366,8 +360,7 @@ def panel_create_project(token):
             tech=request.form.get("tech"),
             duration=request.form.get("duration"),
             github=request.form.get("github")
-        )
-        db.session.add(new_project)
+        ))
         db.session.commit()
         flash("Proyecto creado correctamente")
         return redirect(url_for("panel_dashboard", token=token))
