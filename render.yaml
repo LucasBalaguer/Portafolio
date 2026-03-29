@@ -5,6 +5,7 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     plan: free
+    pythonVersion: "3.11.9"
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -14,5 +15,5 @@ services:
         sync: false
       - key: PANEL_PASSWORD
         sync: false
-      - key: PYTHON_VERSION
-        value: 3.11.0
+      - key: DATABASE_URL
+        sync: false
