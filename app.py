@@ -21,15 +21,11 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 # ----------------------------
 
 db_url = os.getenv("DATABASE_URL", "sqlite:///projects.db")
-
-# Supabase devuelve "postgres://", SQLAlchemy necesita "postgresql://"
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# Evita timeouts en conexiones PostgreSQL de larga duración
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
@@ -51,6 +47,10 @@ class Project(db.Model):
     tech = db.Column(db.String(300))
     duration = db.Column(db.String(100))
     github = db.Column(db.String(300))
+    # Nuevos campos de contenido
+    problem = db.Column(db.Text)
+    process = db.Column(db.Text)
+    results = db.Column(db.Text)
 
     def __repr__(self):
         return f"<Project {self.title}>"
@@ -223,7 +223,10 @@ def admin_create_project():
             role=request.form.get("role"),
             tech=request.form.get("tech"),
             duration=request.form.get("duration"),
-            github=request.form.get("github")
+            github=request.form.get("github"),
+            problem=request.form.get("problem"),
+            process=request.form.get("process"),
+            results=request.form.get("results"),
         ))
         db.session.commit()
         flash("Proyecto creado correctamente")
@@ -243,6 +246,9 @@ def admin_edit_project(id):
         project.tech = request.form.get("tech")
         project.duration = request.form.get("duration")
         project.github = request.form.get("github")
+        project.problem = request.form.get("problem")
+        project.process = request.form.get("process")
+        project.results = request.form.get("results")
         db.session.commit()
         flash("Proyecto actualizado correctamente")
         return redirect(url_for("admin_dashboard"))
@@ -359,7 +365,10 @@ def panel_create_project(token):
             role=request.form.get("role"),
             tech=request.form.get("tech"),
             duration=request.form.get("duration"),
-            github=request.form.get("github")
+            github=request.form.get("github"),
+            problem=request.form.get("problem"),
+            process=request.form.get("process"),
+            results=request.form.get("results"),
         ))
         db.session.commit()
         flash("Proyecto creado correctamente")
@@ -381,6 +390,9 @@ def panel_edit_project(token, id):
         project.tech = request.form.get("tech")
         project.duration = request.form.get("duration")
         project.github = request.form.get("github")
+        project.problem = request.form.get("problem")
+        project.process = request.form.get("process")
+        project.results = request.form.get("results")
         db.session.commit()
         flash("Proyecto actualizado correctamente")
         return redirect(url_for("panel_dashboard", token=token))
@@ -400,7 +412,7 @@ def panel_delete_project(token, id):
 
 
 # ----------------------------
-# CREAR TABLAS
+# CREAR / MIGRAR TABLAS
 # ----------------------------
 
 with app.app_context():

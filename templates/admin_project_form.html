@@ -5,22 +5,28 @@
     <input type="text" name="title" placeholder="Título"
            value="{{ project.title if project else '' }}" required>
 
-    <textarea name="description" placeholder="Descripción" required>{{ project.description if project else '' }}</textarea>
+    <textarea name="description" placeholder="Descripción corta" required>{{ project.description if project else '' }}</textarea>
 
-    <input type="text" name="slug" placeholder="Slug (ej: mi-proyecto)"
+    <input type="text" name="slug" placeholder="Slug"
            value="{{ project.slug if project else '' }}" required>
 
-    <input type="text" name="role" placeholder="Rol (ej: Data Analyst)"
+    <input type="text" name="role" placeholder="Rol"
            value="{{ project.role if project else '' }}">
 
-    <input type="text" name="tech" placeholder="Tecnologías (ej: Python, Pandas, Scikit-learn)"
+    <input type="text" name="tech" placeholder="Tecnologías"
            value="{{ project.tech if project else '' }}">
 
-    <input type="text" name="duration" placeholder="Duración (ej: 2 semanas)"
+    <input type="text" name="duration" placeholder="Duración"
            value="{{ project.duration if project else '' }}">
 
-    <input type="url" name="github" placeholder="GitHub Link"
+    <input type="url" name="github" placeholder="GitHub URL"
            value="{{ project.github if project else '' }}">
+
+    <textarea name="problem" placeholder="El problema">{{ project.problem if project else '' }}</textarea>
+
+    <textarea name="process" placeholder="Proceso">{{ project.process if project else '' }}</textarea>
+
+    <textarea name="results" placeholder="Resultados">{{ project.results if project else '' }}</textarea>
 
     <button type="submit">{{ action }}</button>
 

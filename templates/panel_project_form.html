@@ -36,7 +36,7 @@
 
         .form-card {
             width: 100%;
-            max-width: 600px;
+            max-width: 640px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 14px;
@@ -65,8 +65,23 @@
 
         .back-link:hover { color: var(--text); }
 
-        .form-group {
-            margin-bottom: 1.25rem;
+        .section-divider {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin: 2rem 0 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
 
         label {
@@ -97,10 +112,8 @@
             background: var(--accent-dim);
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
+        textarea { resize: vertical; min-height: 100px; }
+        textarea.tall { min-height: 130px; }
 
         .hint {
             font-family: var(--mono);
@@ -146,10 +159,7 @@
             transition: border-color 0.2s, color 0.2s;
         }
 
-        .btn-cancel:hover {
-            border-color: var(--accent);
-            color: var(--text);
-        }
+        .btn-cancel:hover { border-color: var(--accent); color: var(--text); }
     </style>
 </head>
 <body>
@@ -160,6 +170,10 @@
         </div>
 
         <form method="POST">
+
+            <!-- INFO BÁSICA -->
+            <p class="section-divider">Información básica</p>
+
             <div class="form-group">
                 <label for="title">Título *</label>
                 <input type="text" id="title" name="title"
@@ -167,7 +181,7 @@
             </div>
 
             <div class="form-group">
-                <label for="description">Descripción *</label>
+                <label for="description">Descripción corta * <span style="font-size:0.6rem;opacity:0.6">(aparece en la tarjeta de proyectos)</span></label>
                 <textarea id="description" name="description" required>{{ project.description if project else '' }}</textarea>
             </div>
 
@@ -178,11 +192,19 @@
                 <p class="hint">Solo minúsculas, números y guiones. Ej: mi-proyecto-eda</p>
             </div>
 
-            <div class="form-group">
-                <label for="role">Rol</label>
-                <input type="text" id="role" name="role"
-                       value="{{ project.role if project else '' }}"
-                       placeholder="Ej: Data Analyst">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="role">Rol</label>
+                    <input type="text" id="role" name="role"
+                           value="{{ project.role if project else '' }}"
+                           placeholder="Ej: Data Analyst">
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duración</label>
+                    <input type="text" id="duration" name="duration"
+                           value="{{ project.duration if project else '' }}"
+                           placeholder="Ej: 3 semanas">
+                </div>
             </div>
 
             <div class="form-group">
@@ -193,23 +215,38 @@
             </div>
 
             <div class="form-group">
-                <label for="duration">Duración</label>
-                <input type="text" id="duration" name="duration"
-                       value="{{ project.duration if project else '' }}"
-                       placeholder="Ej: 3 semanas">
-            </div>
-
-            <div class="form-group">
                 <label for="github">GitHub URL</label>
                 <input type="url" id="github" name="github"
                        value="{{ project.github if project else '' }}"
                        placeholder="https://github.com/...">
             </div>
 
+            <!-- CONTENIDO DETALLE -->
+            <p class="section-divider">Contenido del detalle del proyecto</p>
+
+            <div class="form-group">
+                <label for="problem">El problema</label>
+                <textarea id="problem" name="problem" class="tall"
+                          placeholder="¿Qué problema resolvía este proyecto? ¿Cuál era el objetivo?">{{ project.problem if project else '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="process">Proceso</label>
+                <textarea id="process" name="process" class="tall"
+                          placeholder="¿Cómo lo abordaste? Pasos, metodología, decisiones...">{{ project.process if project else '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="results">Resultados</label>
+                <textarea id="results" name="results" class="tall"
+                          placeholder="¿Qué conseguiste? Métricas, conclusiones, aprendizajes...">{{ project.results if project else '' }}</textarea>
+            </div>
+
             <div class="form-actions">
                 <a href="{{ url_for('panel_dashboard', token=token) }}" class="btn-cancel">Cancelar</a>
                 <button type="submit" class="btn-submit">{{ action }} proyecto</button>
             </div>
+
         </form>
     </div>
 </body>
