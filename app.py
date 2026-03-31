@@ -143,7 +143,8 @@ def track_visit(page: str):
 @app.route("/")
 def home():
     track_visit("home")
-    return render_template("index.html")
+    recent_projects = Project.query.order_by(Project.id.desc()).limit(3).all()
+    return render_template("index.html", recent_projects=recent_projects)
 
 
 @app.route("/proyectos")

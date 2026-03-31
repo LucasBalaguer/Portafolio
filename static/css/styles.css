@@ -353,6 +353,7 @@ body::after {
    RESPONSIVE
 ===================================================== */
 
+/* --- Tablet (≤900px) --- */
 @media (max-width: 900px) {
     .projects-floating {
         display: none;
@@ -364,6 +365,155 @@ body::after {
 
     .nav-centered {
         gap: 2rem;
+    }
+}
+
+/* --- Mobile (≤600px) --- */
+@media (max-width: 600px) {
+
+    /* NAV */
+    .main-header {
+        top: 1rem;
+        padding: 0 1rem;
+    }
+
+    .nav-centered {
+        gap: 1.25rem;
+        font-size: 0.82rem;
+    }
+
+    /* HERO */
+    body.home {
+        height: auto;
+        overflow: auto;
+    }
+
+    .hero-centered {
+        height: auto;
+        min-height: 100svh;
+        padding: 6rem 1.25rem 3rem;
+        gap: 0.75rem;
+    }
+
+    .hero-glass {
+        padding: 2rem 1.5rem;
+        width: 100%;
+    }
+
+    .hero-centered h1 {
+        font-size: 2rem;
+    }
+
+    .hero-centered h2 {
+        font-size: 1.1rem;
+    }
+
+    .hero-centered p {
+        font-size: 0.9rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+        width: 100%;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        text-align: center;
+        width: 100%;
+    }
+
+    /* PROYECTOS RECIENTES (mini-grid) */
+    .projects-floating {
+        display: none;
+    }
+
+    /* PROJECT DETAIL */
+    .project-hero {
+        margin: 5rem 1.25rem 2rem;
+        padding: 0;
+    }
+
+    .project-hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .project-meta {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+        margin: 1.5rem 1.25rem 3rem;
+    }
+
+    .project-section {
+        margin: 0 1.25rem 3rem;
+    }
+
+    .project-actions {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 1.25rem;
+        margin-bottom: 3rem;
+    }
+
+    .project-actions .btn-primary,
+    .project-actions .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .project-nav {
+        flex-direction: column;
+        margin: 2rem 1.25rem 4rem;
+    }
+
+    .project-nav-item.next {
+        text-align: left;
+    }
+
+    /* SKILLS */
+    .skills-hero {
+        margin-top: 5rem;
+        padding: 0 1.25rem;
+    }
+
+    .skills-hero h1 {
+        font-size: 2rem;
+    }
+
+    .skills-section {
+        padding: 0 1.25rem 3rem;
+    }
+
+    /* PROYECTOS GRID */
+    .projects-section {
+        padding: 1rem 1.25rem;
+        padding-top: 90px;
+    }
+
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .projects-header h1 {
+        font-size: 2rem;
+    }
+
+    /* CONTACTO */
+    .page-centered {
+        padding: 1.25rem;
+        align-items: flex-start;
+        padding-top: 6rem;
+    }
+
+    /* THEME TOGGLE */
+    .theme-toggle {
+        bottom: 1.25rem;
+        left: 1.25rem;
+        width: 42px;
+        height: 42px;
     }
 }
 

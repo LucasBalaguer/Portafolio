@@ -32,27 +32,24 @@ Lucas Balaguer | Analista de Datos
 
     </div>
 
-    <!-- PROYECTOS RECIENTES -->
+    <!-- PROYECTOS RECIENTES — dinámicos desde BD -->
+    {% if recent_projects %}
     <div class="projects-floating">
 
         <span class="projects-label">Proyectos recientes</span>
 
         <div class="projects-mini-grid">
-
-            <a href="{{ url_for('projects') }}" class="mini-project">
-                Vinos<br>ML
+            {% for project in recent_projects %}
+            <a href="{{ url_for('project_detail', slug=project.slug) }}"
+               class="mini-project"
+               title="{{ project.title }}">
+                {{ project.title | truncate(12, True, '') }}
             </a>
-
-            <a href="{{ url_for('projects') }}" class="mini-project">
-                Inmobiliario<br>EDA
-            </a>
-
-            <a href="{{ url_for('projects') }}" class="mini-project">
-                Precios<br>Regresión
-            </a>
-
+            {% endfor %}
         </div>
+
     </div>
+    {% endif %}
 
 </section>
 
