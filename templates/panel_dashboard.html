@@ -429,6 +429,17 @@
             <div class="stat-value">{{ projects | length }}</div>
             <div class="stat-sub">en base de datos</div>
         </div>
+        <div class="stat-card" style="cursor:pointer" onclick="location.href='{{ url_for('panel_messages', token=token) }}'">
+            <div class="stat-label">Mensajes sin leer</div>
+            <div class="stat-value {% if unread_count > 0 %}accent{% endif %}">{{ unread_count }}</div>
+            <div class="stat-sub">
+                {% if unread_count > 0 %}
+                <a href="{{ url_for('panel_messages', token=token) }}" style="color:var(--accent);text-decoration:none">Ver mensajes →</a>
+                {% else %}
+                todos leídos
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <!-- ===== GRÁFICOS ===== -->

@@ -1,5 +1,8 @@
 import os
 import hashlib
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from functools import wraps
 from datetime import datetime, date, timedelta
 from dotenv import load_dotenv
@@ -17,7 +20,6 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 # ----------------------------
 # CONFIGURACIÓN BASE DE DATOS
-# En local → SQLite | En producción → Supabase (PostgreSQL)
 # ----------------------------
 
 db_url = os.getenv("DATABASE_URL", "sqlite:///projects.db")
@@ -47,7 +49,6 @@ class Project(db.Model):
     tech = db.Column(db.String(300))
     duration = db.Column(db.String(100))
     github = db.Column(db.String(300))
-    # Nuevos campos de contenido
     problem = db.Column(db.Text)
     process = db.Column(db.Text)
     results = db.Column(db.Text)
@@ -67,6 +68,19 @@ class PageVisit(db.Model):
 
     def __repr__(self):
         return f"<PageVisit {self.page} {self.visit_date}>"
+
+
+class ContactMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(300))
+    message = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f"<ContactMessage {self.name} {self.sent_at}>"
 
 
 # ----------------------------
@@ -137,6 +151,51 @@ def track_visit(page: str):
 
 
 # ----------------------------
+# ENVÍO DE EMAIL
+# ----------------------------
+
+def send_contact_email(name: str, email: str, subject: str, message: str):
+    """Envía el mensaje de contacto al email configurado via Gmail SMTP."""
+    try:
+        smtp_user = os.getenv("GMAIL_USER")
+        smtp_pass = os.getenv("GMAIL_APP_PASSWORD")
+        recipient = os.getenv("CONTACT_EMAIL", smtp_user)
+
+        if not smtp_user or not smtp_pass:
+            return False
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"[Portfolio] {subject or 'Nuevo mensaje de contacto'}"
+        msg["From"] = smtp_user
+        msg["To"] = recipient
+        msg["Reply-To"] = email
+
+        body_text = f"Nombre: {name}\nEmail: {email}\n\n{message}"
+        body_html = f"""
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:#2563eb">Nuevo mensaje desde tu portfolio</h2>
+            <p><strong>Nombre:</strong> {name}</p>
+            <p><strong>Email:</strong> <a href="mailto:{email}">{email}</a></p>
+            <p><strong>Asunto:</strong> {subject or '—'}</p>
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:1.5rem 0">
+            <p style="white-space:pre-wrap">{message}</p>
+        </div>
+        """
+
+        msg.attach(MIMEText(body_text, "plain"))
+        msg.attach(MIMEText(body_html, "html"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_user, recipient, msg.as_string())
+
+        return True
+    except Exception as e:
+        print(f"Error enviando email: {e}")
+        return False
+
+
+# ----------------------------
 # RUTAS PÚBLICAS
 # ----------------------------
 
@@ -183,8 +242,28 @@ def skills():
 def contacto():
     track_visit("contacto")
     success = False
+
     if request.method == "POST":
-        success = True
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        subject = request.form.get("subject", "").strip()
+        message = request.form.get("message", "").strip()
+
+        if name and email and message:
+            # Guardar en BD
+            db.session.add(ContactMessage(
+                name=name,
+                email=email,
+                subject=subject,
+                message=message,
+            ))
+            db.session.commit()
+
+            # Enviar email (no bloquea si falla)
+            send_contact_email(name, email, subject, message)
+
+            success = True
+
     return render_template("contact.html", success=success)
 
 
@@ -340,6 +419,12 @@ def panel_dashboard(token):
         PageVisit.visit_date >= today - timedelta(days=13)
     ).group_by(PageVisit.visit_date).order_by(PageVisit.visit_date).all()
 
+    # Mensajes no leídos
+    unread_count = ContactMessage.query.filter_by(read=False).count()
+    recent_messages = ContactMessage.query.order_by(
+        ContactMessage.sent_at.desc()
+    ).limit(5).all()
+
     return render_template(
         "panel_dashboard.html",
         token=token,
@@ -350,7 +435,33 @@ def panel_dashboard(token):
         devices=devices,
         daily_visits=daily_visits,
         projects=Project.query.all(),
+        unread_count=unread_count,
+        recent_messages=recent_messages,
     )
+
+
+@app.route("/panel/<token>/messages")
+@panel_required
+def panel_messages(token):
+    if not _validate_token(token):
+        abort(404)
+    messages = ContactMessage.query.order_by(ContactMessage.sent_at.desc()).all()
+    # Marcar todos como leídos al abrir
+    ContactMessage.query.filter_by(read=False).update({"read": True})
+    db.session.commit()
+    return render_template("panel_messages.html", token=token, messages=messages)
+
+
+@app.route("/panel/<token>/messages/<int:id>/delete", methods=["POST"])
+@panel_required
+def panel_delete_message(token, id):
+    if not _validate_token(token):
+        abort(404)
+    msg = ContactMessage.query.get_or_404(id)
+    db.session.delete(msg)
+    db.session.commit()
+    flash("Mensaje eliminado")
+    return redirect(url_for("panel_messages", token=token))
 
 
 @app.route("/panel/<token>/project/new", methods=["GET", "POST"])
@@ -413,7 +524,7 @@ def panel_delete_project(token, id):
 
 
 # ----------------------------
-# CREAR / MIGRAR TABLAS
+# CREAR TABLAS
 # ----------------------------
 
 with app.app_context():
