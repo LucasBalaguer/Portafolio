@@ -154,45 +154,102 @@ def track_visit(page: str):
 # ENVÍO DE EMAIL
 # ----------------------------
 
-def send_contact_email(name: str, email: str, subject: str, message: str):
-    """Envía el mensaje de contacto al email configurado via Gmail SMTP."""
-    try:
-        smtp_user = os.getenv("GMAIL_USER")
-        smtp_pass = os.getenv("GMAIL_APP_PASSWORD")
-        recipient = os.getenv("CONTACT_EMAIL", smtp_user)
+def _smtp_connect():
+    """Crea y devuelve una conexión SMTP autenticada con Gmail."""
+    smtp_user = os.getenv("GMAIL_USER", "").strip()
+    smtp_pass = os.getenv("GMAIL_APP_PASSWORD", "").strip()
 
-        if not smtp_user or not smtp_pass:
-            return False
+    if not smtp_user or not smtp_pass:
+        raise ValueError("GMAIL_USER o GMAIL_APP_PASSWORD no están configurados")
 
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"[Portfolio] {subject or 'Nuevo mensaje de contacto'}"
-        msg["From"] = smtp_user
-        msg["To"] = recipient
-        msg["Reply-To"] = email
+    server = smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10)
+    server.login(smtp_user, smtp_pass)
+    return server, smtp_user
 
-        body_text = f"Nombre: {name}\nEmail: {email}\n\n{message}"
-        body_html = f"""
-        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-            <h2 style="color:#2563eb">Nuevo mensaje desde tu portfolio</h2>
-            <p><strong>Nombre:</strong> {name}</p>
-            <p><strong>Email:</strong> <a href="mailto:{email}">{email}</a></p>
-            <p><strong>Asunto:</strong> {subject or '—'}</p>
-            <hr style="border:none;border-top:1px solid #e5e7eb;margin:1.5rem 0">
-            <p style="white-space:pre-wrap">{message}</p>
-        </div>
-        """
 
-        msg.attach(MIMEText(body_text, "plain"))
-        msg.attach(MIMEText(body_html, "html"))
+def send_notification_email(name: str, sender_email: str, subject: str, message: str):
+    """Envía notificación a Lucas de que ha llegado un mensaje."""
+    smtp_user = os.getenv("GMAIL_USER", "").strip()
+    recipient = os.getenv("CONTACT_EMAIL", smtp_user)
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(smtp_user, smtp_pass)
-            server.sendmail(smtp_user, recipient, msg.as_string())
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = f"[Portfolio] {subject or 'Nuevo mensaje de contacto'}"
+    msg["From"] = smtp_user
+    msg["To"] = recipient
+    msg["Reply-To"] = sender_email
 
-        return True
-    except Exception as e:
-        print(f"Error enviando email: {e}")
-        return False
+    body_html = f"""
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:2rem">
+        <h2 style="color:#2563eb;margin-bottom:1.5rem">
+            📬 Nuevo mensaje desde tu portfolio
+        </h2>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem">
+            <tr>
+                <td style="padding:0.5rem 0;color:#6b7280;font-size:0.85rem;width:90px">Nombre</td>
+                <td style="padding:0.5rem 0;font-weight:600">{name}</td>
+            </tr>
+            <tr>
+                <td style="padding:0.5rem 0;color:#6b7280;font-size:0.85rem">Email</td>
+                <td style="padding:0.5rem 0">
+                    <a href="mailto:{sender_email}" style="color:#2563eb">{sender_email}</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:0.5rem 0;color:#6b7280;font-size:0.85rem">Asunto</td>
+                <td style="padding:0.5rem 0">{subject or '—'}</td>
+            </tr>
+        </table>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin-bottom:1.5rem">
+        <p style="white-space:pre-wrap;line-height:1.6">{message}</p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:1.5rem 0">
+        <a href="mailto:{sender_email}?subject=Re: {subject or 'Tu mensaje'}"
+           style="display:inline-block;background:#2563eb;color:white;
+                  padding:0.6rem 1.2rem;border-radius:6px;text-decoration:none;
+                  font-size:0.9rem">
+            Responder →
+        </a>
+    </div>
+    """
+
+    msg.attach(MIMEText(body_html, "html"))
+
+    server, smtp_user = _smtp_connect()
+    with server:
+        server.sendmail(smtp_user, recipient, msg.as_string())
+
+
+def send_confirmation_email(name: str, recipient_email: str, subject: str):
+    """Envía confirmación al remitente de que su mensaje fue recibido."""
+    smtp_user = os.getenv("GMAIL_USER", "").strip()
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "He recibido tu mensaje · Lucas Balaguer"
+    msg["From"] = f"Lucas Balaguer <{smtp_user}>"
+    msg["To"] = recipient_email
+
+    body_html = f"""
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:2rem">
+        <h2 style="color:#1f2933;margin-bottom:0.5rem">¡Gracias, {name}!</h2>
+        <p style="color:#6b7280;margin-bottom:1.5rem">
+            He recibido tu mensaje sobre <strong>"{subject or 'tu consulta'}"</strong>
+            y te responderé lo antes posible.
+        </p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin-bottom:1.5rem">
+        <p style="font-size:0.85rem;color:#9ca3af">
+            Este es un mensaje automático. No respondas directamente a este correo.<br>
+            Si necesitas contactarme urgentemente, escríbeme a
+            <a href="mailto:lucas.balaguer91@gmail.com" style="color:#2563eb">
+                lucas.balaguer91@gmail.com
+            </a>
+        </p>
+    </div>
+    """
+
+    msg.attach(MIMEText(body_html, "html"))
+
+    server, smtp_user = _smtp_connect()
+    with server:
+        server.sendmail(smtp_user, recipient_email, msg.as_string())
 
 
 # ----------------------------
@@ -242,14 +299,20 @@ def skills():
 def contacto():
     track_visit("contacto")
     success = False
+    error = None
 
     if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        email = request.form.get("email", "").strip()
+        name    = request.form.get("name", "").strip()
+        email   = request.form.get("email", "").strip()
         subject = request.form.get("subject", "").strip()
         message = request.form.get("message", "").strip()
 
-        if name and email and message:
+        # Validación servidor (respaldo a la validación HTML)
+        if not all([name, email, message]):
+            error = "Por favor rellena todos los campos obligatorios."
+        elif "@" not in email or "." not in email.split("@")[-1]:
+            error = "El email no tiene un formato válido."
+        else:
             # Guardar en BD
             db.session.add(ContactMessage(
                 name=name,
@@ -259,12 +322,20 @@ def contacto():
             ))
             db.session.commit()
 
-            # Enviar email (no bloquea si falla)
-            send_contact_email(name, email, subject, message)
+            # Enviar emails — logear errores sin romper el flujo
+            try:
+                send_notification_email(name, email, subject, message)
+            except Exception as e:
+                app.logger.error(f"[EMAIL NOTIFICATION ERROR] {e}")
+
+            try:
+                send_confirmation_email(name, email, subject)
+            except Exception as e:
+                app.logger.error(f"[EMAIL CONFIRMATION ERROR] {e}")
 
             success = True
 
-    return render_template("contact.html", success=success)
+    return render_template("contact.html", success=success, error=error)
 
 
 # ----------------------------
@@ -419,7 +490,6 @@ def panel_dashboard(token):
         PageVisit.visit_date >= today - timedelta(days=13)
     ).group_by(PageVisit.visit_date).order_by(PageVisit.visit_date).all()
 
-    # Mensajes no leídos
     unread_count = ContactMessage.query.filter_by(read=False).count()
     recent_messages = ContactMessage.query.order_by(
         ContactMessage.sent_at.desc()
@@ -446,7 +516,6 @@ def panel_messages(token):
     if not _validate_token(token):
         abort(404)
     messages = ContactMessage.query.order_by(ContactMessage.sent_at.desc()).all()
-    # Marcar todos como leídos al abrir
     ContactMessage.query.filter_by(read=False).update({"read": True})
     db.session.commit()
     return render_template("panel_messages.html", token=token, messages=messages)

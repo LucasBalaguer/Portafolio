@@ -15,7 +15,7 @@
             </p>
         </header>
 
-        <!-- REDES / LINKS -->
+        <!-- LINKS DE CONTACTO -->
         <div class="contact-links">
             <a href="mailto:lucas.balaguer91@gmail.com" class="contact-link">
                 <span class="contact-link-icon">✉</span>
@@ -23,19 +23,19 @@
             </a>
             <a href="https://github.com/LucasBalaguer" target="_blank" rel="noopener" class="contact-link">
                 <span class="contact-link-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
                     </svg>
                 </span>
                 <span>github.com/LucasBalaguer</span>
             </a>
-            <a href="https://www.linkedin.com/in/lucasbalaguer/" target="_blank" rel="noopener" class="contact-link">
+            <a href="https://www.linkedin.com/in/lucas-cavalcante-balaguer" target="_blank" rel="noopener" class="contact-link">
                 <span class="contact-link-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                     </svg>
                 </span>
-                <span>www.linkedin.com/in/lucasbalaguer/</span>
+                <span>linkedin.com/in/lucas-cavalcante-balaguer</span>
             </a>
         </div>
 
@@ -43,44 +43,67 @@
             <span>o envíame un mensaje</span>
         </div>
 
-        <!-- FORMULARIO -->
+        <!-- ESTADO ÉXITO -->
         {% if success %}
         <div class="contact-success">
             <span>✓</span>
             <div>
-                <strong>Mensaje enviado</strong>
-                <p>Gracias, te responderé lo antes posible.</p>
+                <strong>Mensaje enviado correctamente</strong>
+                <p>Gracias por escribirme. Recibirás una confirmación en tu email y te responderé lo antes posible.</p>
             </div>
         </div>
-        {% else %}
-        <form method="POST" class="contact-form">
+
+        <!-- ESTADO ERROR (validación servidor) -->
+        {% elif error %}
+        <div class="contact-error">
+            <span>⚠</span>
+            <div>
+                <strong>Error al enviar</strong>
+                <p>{{ error }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- FORMULARIO — se oculta tras éxito -->
+        {% if not success %}
+        <form method="POST" class="contact-form" id="contactForm"
+              novalidate onsubmit="return validateForm()">
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="name">Nombre</label>
+                    <label for="name">Nombre <span class="required">*</span></label>
                     <input type="text" id="name" name="name"
-                           placeholder="Tu nombre" required>
+                           placeholder="Tu nombre"
+                           value="{{ request.form.get('name', '') if error else '' }}"
+                           required minlength="2">
+                    <span class="field-error" id="nameError"></span>
                 </div>
                 <div class="form-group">
-                    <label for="email">Email</label>
+                    <label for="email">Email <span class="required">*</span></label>
                     <input type="email" id="email" name="email"
-                           placeholder="tu@email.com" required>
+                           placeholder="tu@email.com"
+                           value="{{ request.form.get('email', '') if error else '' }}"
+                           required>
+                    <span class="field-error" id="emailError"></span>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="subject">Asunto</label>
                 <input type="text" id="subject" name="subject"
-                       placeholder="¿De qué quieres hablar?">
+                       placeholder="¿De qué quieres hablar?"
+                       value="{{ request.form.get('subject', '') if error else '' }}">
             </div>
 
             <div class="form-group">
-                <label for="message">Mensaje</label>
-                <textarea id="message" name="message"
-                          rows="5" placeholder="Cuéntame..." required></textarea>
+                <label for="message">Mensaje <span class="required">*</span></label>
+                <textarea id="message" name="message" rows="5"
+                          placeholder="Cuéntame..." required
+                          minlength="10">{{ request.form.get('message', '') if error else '' }}</textarea>
+                <span class="field-error" id="messageError"></span>
             </div>
 
-            <button type="submit" class="btn-primary btn-full">
+            <button type="submit" class="btn-primary btn-full" id="submitBtn">
                 Enviar mensaje →
             </button>
 
@@ -89,5 +112,52 @@
 
     </div>
 </section>
+
+<script>
+function validateForm() {
+    let valid = true;
+
+    const name = document.getElementById('name');
+    const email = document.getElementById('email');
+    const message = document.getElementById('message');
+
+    // Reset errores
+    ['nameError', 'emailError', 'messageError'].forEach(id => {
+        document.getElementById(id).textContent = '';
+    });
+    [name, email, message].forEach(el => el.classList.remove('input-error'));
+
+    // Nombre
+    if (!name.value.trim() || name.value.trim().length < 2) {
+        document.getElementById('nameError').textContent = 'Introduce tu nombre (mínimo 2 caracteres)';
+        name.classList.add('input-error');
+        valid = false;
+    }
+
+    // Email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
+        document.getElementById('emailError').textContent = 'Introduce un email válido';
+        email.classList.add('input-error');
+        valid = false;
+    }
+
+    // Mensaje
+    if (!message.value.trim() || message.value.trim().length < 10) {
+        document.getElementById('messageError').textContent = 'El mensaje debe tener al menos 10 caracteres';
+        message.classList.add('input-error');
+        valid = false;
+    }
+
+    if (valid) {
+        // Deshabilitar botón para evitar doble envío
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+    }
+
+    return valid;
+}
+</script>
 
 {% endblock %}

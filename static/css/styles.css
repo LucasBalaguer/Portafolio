@@ -1148,3 +1148,40 @@ body.dark .form-group textarea:focus {
 .contact-success span { font-size: 1.3rem; line-height: 1; }
 .contact-success strong { display: block; margin-bottom: 0.2rem; }
 .contact-success p { font-size: 0.85rem; opacity: 0.8; }
+
+/* Contact — error states & extras */
+.required { color: var(--accent); }
+
+.field-error {
+    font-size: 0.72rem;
+    color: #dc2626;
+    margin-top: 0.25rem;
+    min-height: 1rem;
+    display: block;
+}
+
+.input-error {
+    border-color: #dc2626 !important;
+    background: rgba(220, 38, 38, 0.04) !important;
+}
+
+.contact-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(220, 38, 38, 0.06);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: var(--radius-md);
+    color: #dc2626;
+    margin-bottom: 1.5rem;
+}
+
+.contact-error span { font-size: 1.2rem; }
+.contact-error strong { display: block; margin-bottom: 0.2rem; }
+.contact-error p { font-size: 0.85rem; opacity: 0.85; }
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
