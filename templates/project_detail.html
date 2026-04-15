@@ -1,23 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}
-Proyecto | {{ project.title }}
-{% endblock %}
+{% block title %}{{ project.title }} | Lucas Balaguer{% endblock %}
+{% block description %}{{ project.description }}{% endblock %}
+{% block og_title %}{{ project.title }} | Lucas Balaguer{% endblock %}
+{% block og_description %}{{ project.description }}{% endblock %}
+{% block twitter_title %}{{ project.title }} | Lucas Balaguer{% endblock %}
+{% block twitter_description %}{{ project.description }}{% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
 <section class="project-hero">
     {% if project.tech %}
     <span class="project-tag">{{ project.tech }}</span>
     {% endif %}
-
     <h1>{{ project.title }}</h1>
-
     <p class="project-intro">{{ project.description }}</p>
 </section>
 
-<!-- META INFO -->
 <section class="project-meta">
     {% if project.role %}
     <div class="meta-item">
@@ -25,14 +24,12 @@ Proyecto | {{ project.title }}
         <span>{{ project.role }}</span>
     </div>
     {% endif %}
-
     {% if project.tech %}
     <div class="meta-item">
         <span class="meta-label">Tecnologías</span>
         <span>{{ project.tech }}</span>
     </div>
     {% endif %}
-
     {% if project.duration %}
     <div class="meta-item">
         <span class="meta-label">Duración</span>
@@ -41,56 +38,49 @@ Proyecto | {{ project.title }}
     {% endif %}
 </section>
 
-<!-- PROBLEMA -->
 {% if project.problem %}
-<section class="project-section">
+<section class="project-section fade-in-section">
     <h2>El problema</h2>
     <p>{{ project.problem }}</p>
 </section>
 {% endif %}
 
-<!-- PROCESO -->
 {% if project.process %}
-<section class="project-section glass-card">
+<section class="project-section glass-card fade-in-section">
     <h2>Proceso</h2>
     <p>{{ project.process }}</p>
 </section>
 {% endif %}
 
-<!-- RESULTADOS -->
 {% if project.results %}
-<section class="project-section">
+<section class="project-section fade-in-section">
     <h2>Resultados</h2>
     <p>{{ project.results }}</p>
 </section>
 {% endif %}
 
-<!-- ACCIONES -->
-<section class="project-actions">
+<section class="project-actions fade-in-section">
     {% if project.github %}
     <a href="{{ project.github }}" target="_blank" class="btn-primary">
         Ver código en GitHub
     </a>
     {% endif %}
-
     <a href="{{ url_for('projects') }}" class="btn-secondary">
         Volver a proyectos
     </a>
 </section>
 
-<!-- NAVEGACIÓN ENTRE PROYECTOS -->
 <nav class="project-nav">
     {% if prev_project %}
     <a href="{{ url_for('project_detail', slug=prev_project.slug) }}"
-       class="project-nav-item prev">
+       class="project-nav-item prev fade-in-section">
         <span class="nav-label">Proyecto anterior</span>
         <span class="nav-title">{{ prev_project.title }}</span>
     </a>
     {% endif %}
-
     {% if next_project %}
     <a href="{{ url_for('project_detail', slug=next_project.slug) }}"
-       class="project-nav-item next">
+       class="project-nav-item next fade-in-section">
         <span class="nav-label">Siguiente proyecto</span>
         <span class="nav-title">{{ next_project.title }}</span>
     </a>

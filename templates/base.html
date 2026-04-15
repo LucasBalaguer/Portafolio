@@ -2,17 +2,35 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Lucas Balaguer{% endblock %}</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <title>{% block title %}Lucas Balaguer | Analista de Datos{% endblock %}</title>
+    <meta name="description" content="{% block description %}Portfolio de Lucas Balaguer, Analista de Datos especializado en Python, Machine Learning y visualización de datos.{% endblock %}">
+    <meta name="author" content="Lucas Balaguer">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph (LinkedIn, WhatsApp, etc.) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Lucas Balaguer">
+    <meta property="og:title" content="{% block og_title %}Lucas Balaguer | Analista de Datos{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Portfolio de Lucas Balaguer, Analista de Datos especializado en Python, Machine Learning y visualización de datos.{% endblock %}">
+    <meta property="og:url" content="https://lucascavalcante.es{{ request.path }}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{% block twitter_title %}Lucas Balaguer | Analista de Datos{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Portfolio de Lucas Balaguer, Analista de Datos especializado en Python, Machine Learning y visualización de datos.{% endblock %}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -22,18 +40,18 @@
 
 <header class="main-header">
     <nav class="nav-centered" aria-label="Navegación principal">
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('projects') }}">Proyectos</a>
-        <a href="{{ url_for('skills') }}">Skills</a>
-        <a href="{{ url_for('contacto') }}">Contacto</a>
+        <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="active"{% endif %}>Home</a>
+        <a href="{{ url_for('projects') }}" {% if request.endpoint == 'projects' %}class="active"{% endif %}>Proyectos</a>
+        <a href="{{ url_for('skills') }}" {% if request.endpoint == 'skills' %}class="active"{% endif %}>Skills</a>
+        <a href="{{ url_for('contacto') }}" {% if request.endpoint == 'contacto' %}class="active"{% endif %}>Contacto</a>
     </nav>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-    <div class="flash-messages">
-      {% for message in messages %}
-        <div class="flash">{{ message }}</div>
-         {% endfor %}
+        <div class="flash-messages">
+            {% for message in messages %}
+            <div class="flash">{{ message }}</div>
+            {% endfor %}
         </div>
         {% endif %}
     {% endwith %}
@@ -54,7 +72,6 @@
 <script src="{{ url_for('static', filename='js/glass.js') }}"></script>
 <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tilt.js') }}"></script>
-
 
 </body>
 </html>

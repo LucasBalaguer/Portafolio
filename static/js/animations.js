@@ -1,10 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const elements = document.querySelectorAll(".fade-slide");
 
-    // Evitar re-animar si ya se ha animado en esta sesión
-    const alreadyAnimated = sessionStorage.getItem("projectsAnimated");
+    // =====================================================
+    // 1. ENTRADA ESCALONADA — .fade-slide
+    //    Para tarjetas de proyectos y skills (en cuadrícula)
+    //    El CSS aplica transition-delay escalonado por nth-child
+    // =====================================================
 
-    const observer = new IntersectionObserver(
+    const staggerElements = document.querySelectorAll(".fade-slide");
+
+    const staggerObserver = new IntersectionObserver(
         (entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -13,16 +17,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         },
-        {
-            threshold: 0.15
-        }
+        { threshold: 0.1 }
     );
 
-    if (!alreadyAnimated) {
-        elements.forEach(el => observer.observe(el));
-        sessionStorage.setItem("projectsAnimated", "true");
-    } else {
-        // Si ya se animó, mostrar directamente sin esperar
-        elements.forEach(el => el.classList.add("visible"));
-    }
+    staggerElements.forEach(el => staggerObserver.observe(el));
+
+
+    // =====================================================
+    // 2. SCROLL REVEAL — .fade-in-section
+    //    Para secciones de texto (detalle de proyecto)
+    //    Entran una a una al hacer scroll
+    // =====================================================
+
+    const sectionElements = document.querySelectorAll(".fade-in-section");
+
+    const sectionObserver = new IntersectionObserver(
+        (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    sectionElements.forEach(el => sectionObserver.observe(el));
+
 });

@@ -1185,3 +1185,33 @@ button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* =====================================================
+   FADE-IN-SECTION — scroll reveal para secciones
+   (usado en project_detail: problema, proceso, resultados)
+===================================================== */
+
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+        opacity 0.6s ease,
+        transform 0.6s ease;
+}
+
+.fade-in-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* =====================================================
+   FADE-SLIDE — entrada escalonada para grids
+   Extendido hasta 12 elementos
+===================================================== */
+
+.fade-slide:nth-child(7)  { transition-delay: 0.47s; }
+.fade-slide:nth-child(8)  { transition-delay: 0.54s; }
+.fade-slide:nth-child(9)  { transition-delay: 0.61s; }
+.fade-slide:nth-child(10) { transition-delay: 0.68s; }
+.fade-slide:nth-child(11) { transition-delay: 0.75s; }
+.fade-slide:nth-child(12) { transition-delay: 0.82s; }
