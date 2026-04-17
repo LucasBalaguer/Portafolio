@@ -151,11 +151,70 @@ def track_visit(page: str):
 
 
 # ----------------------------
+# ANTI-SPAM
+# ----------------------------
+
+# Rate limiting: máximo de mensajes por IP en una ventana de tiempo
+RATE_LIMIT_MAX = 3          # máximo 3 mensajes
+RATE_LIMIT_WINDOW = 60      # en los últimos 60 minutos
+
+def _get_client_ip() -> str:
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown")
+    return ip.split(",")[0].strip()
+
+
+def _check_rate_limit(ip: str) -> bool:
+    """
+    Devuelve True si la IP está dentro del límite permitido.
+    Devuelve False si ha superado el máximo de mensajes.
+    Usamos la tabla ContactMessage para contar mensajes recientes.
+    """
+    ip_hash = _hash_ip(ip)
+    window_start = datetime.utcnow() - timedelta(minutes=RATE_LIMIT_WINDOW)
+
+    # Contamos mensajes cuyo ip_hash coincida en la ventana de tiempo
+    # Como ContactMessage no almacena ip_hash, usamos una columna nueva
+    # que añadiremos al modelo a continuación
+    recent_count = ContactMessage.query.filter(
+        ContactMessage.sender_ip == ip_hash,
+        ContactMessage.sent_at >= window_start
+    ).count()
+
+    return recent_count < RATE_LIMIT_MAX
+
+
+def _is_honeypot_filled() -> bool:
+    """
+    El campo honeypot se llama 'website' en el formulario.
+    Los humanos no lo ven (está oculto con CSS).
+    Los bots lo rellenan automáticamente.
+    Devuelve True si el bot ha caído en la trampa.
+    """
+    return bool(request.form.get("website", "").strip())
+
+
+# Modelo actualizado con sender_ip para rate limiting
+# (necesita migración si ya existe la tabla)
+class ContactMessage(db.Model):
+    __tablename__ = "contact_message"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(300))
+    message = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)
+    sender_ip = db.Column(db.String(64))   # hash de la IP para rate limiting
+
+    def __repr__(self):
+        return f"<ContactMessage {self.name} {self.sent_at}>"
+
+
+# ----------------------------
 # ENVÍO DE EMAIL
 # ----------------------------
 
 def _smtp_connect():
-    """Crea y devuelve una conexión SMTP autenticada con Gmail."""
     smtp_user = os.getenv("GMAIL_USER", "").strip()
     smtp_pass = os.getenv("GMAIL_APP_PASSWORD", "").strip()
 
@@ -168,7 +227,6 @@ def _smtp_connect():
 
 
 def send_notification_email(name: str, sender_email: str, subject: str, message: str):
-    """Envía notificación a Lucas de que ha llegado un mensaje."""
     smtp_user = os.getenv("GMAIL_USER", "").strip()
     recipient = os.getenv("CONTACT_EMAIL", smtp_user)
 
@@ -210,16 +268,13 @@ def send_notification_email(name: str, sender_email: str, subject: str, message:
         </a>
     </div>
     """
-
     msg.attach(MIMEText(body_html, "html"))
-
     server, smtp_user = _smtp_connect()
     with server:
         server.sendmail(smtp_user, recipient, msg.as_string())
 
 
 def send_confirmation_email(name: str, recipient_email: str, subject: str):
-    """Envía confirmación al remitente de que su mensaje fue recibido."""
     smtp_user = os.getenv("GMAIL_USER", "").strip()
 
     msg = MIMEMultipart("alternative")
@@ -244,9 +299,7 @@ def send_confirmation_email(name: str, recipient_email: str, subject: str):
         </p>
     </div>
     """
-
     msg.attach(MIMEText(body_html, "html"))
-
     server, smtp_user = _smtp_connect()
     with server:
         server.sendmail(smtp_user, recipient_email, msg.as_string())
@@ -302,27 +355,38 @@ def contacto():
     error = None
 
     if request.method == "POST":
+        # 1. HONEYPOT — si el campo oculto viene relleno, es un bot
+        if _is_honeypot_filled():
+            # Respondemos como si fuera éxito para no alertar al bot
+            app.logger.warning("[SPAM] Honeypot activado")
+            return render_template("contact.html", success=True, error=None)
+
+        ip = _get_client_ip()
+
+        # 2. RATE LIMITING — máximo RATE_LIMIT_MAX mensajes por hora
+        if not _check_rate_limit(ip):
+            error = f"Has enviado demasiados mensajes. Por favor espera un momento antes de volver a intentarlo."
+            return render_template("contact.html", success=False, error=error)
+
         name    = request.form.get("name", "").strip()
         email   = request.form.get("email", "").strip()
         subject = request.form.get("subject", "").strip()
         message = request.form.get("message", "").strip()
 
-        # Validación servidor (respaldo a la validación HTML)
         if not all([name, email, message]):
             error = "Por favor rellena todos los campos obligatorios."
         elif "@" not in email or "." not in email.split("@")[-1]:
             error = "El email no tiene un formato válido."
         else:
-            # Guardar en BD
             db.session.add(ContactMessage(
                 name=name,
                 email=email,
                 subject=subject,
                 message=message,
+                sender_ip=_hash_ip(ip),
             ))
             db.session.commit()
 
-            # Enviar emails — logear errores sin romper el flujo
             try:
                 send_notification_email(name, email, subject, message)
             except Exception as e:
@@ -590,6 +654,19 @@ def panel_delete_project(token, id):
     db.session.commit()
     flash("Proyecto eliminado")
     return redirect(url_for("panel_dashboard", token=token))
+
+
+# ----------------------------
+# PÁGINAS DE ERROR
+# ----------------------------
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("404.html"), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template("500.html"), 500
 
 
 # ----------------------------

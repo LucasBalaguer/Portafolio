@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}404 · Página no encontrada | Lucas Balaguer{% endblock %}
+
+{% block content %}
+
+<section class="error-page">
+    <div class="error-glass hero-glass">
+
+        <span class="error-code">404</span>
+
+        <h1>Página no encontrada</h1>
+
+        <p>
+            La página que buscas no existe o ha sido movida.<br>
+            Pero no te pierdas, puedes volver al inicio.
+        </p>
+
+        <div class="error-actions">
+            <a href="{{ url_for('home') }}" class="btn-primary">
+                Volver al inicio
+            </a>
+            <a href="{{ url_for('projects') }}" class="btn-secondary">
+                Ver proyectos
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

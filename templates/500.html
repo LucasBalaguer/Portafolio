@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}500 · Error del servidor | Lucas Balaguer{% endblock %}
+
+{% block content %}
+
+<section class="error-page">
+    <div class="error-glass hero-glass">
+
+        <span class="error-code">500</span>
+
+        <h1>Error del servidor</h1>
+
+        <p>
+            Algo ha salido mal por mi parte.<br>
+            Inténtalo de nuevo en unos momentos.
+        </p>
+
+        <div class="error-actions">
+            <a href="{{ url_for('home') }}" class="btn-primary">
+                Volver al inicio
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

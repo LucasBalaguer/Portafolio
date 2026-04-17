@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Contacto | Lucas Cavalcante{% endblock %}
+{% block description %}Contacta con Lucas Balaguer, Analista de Datos. Email, LinkedIn y GitHub.{% endblock %}
 
 {% block content %}
 
@@ -43,7 +44,6 @@
             <span>o envíame un mensaje</span>
         </div>
 
-        <!-- ESTADO ÉXITO -->
         {% if success %}
         <div class="contact-success">
             <span>✓</span>
@@ -53,7 +53,6 @@
             </div>
         </div>
 
-        <!-- ESTADO ERROR (validación servidor) -->
         {% elif error %}
         <div class="contact-error">
             <span>⚠</span>
@@ -64,10 +63,17 @@
         </div>
         {% endif %}
 
-        <!-- FORMULARIO — se oculta tras éxito -->
         {% if not success %}
         <form method="POST" class="contact-form" id="contactForm"
               novalidate onsubmit="return validateForm()">
+
+            <!-- HONEYPOT — invisible para humanos, los bots lo rellenan -->
+            <!-- El CSS lo oculta completamente, no uses display:none para que los bots no lo detecten -->
+            <div class="hp-field" aria-hidden="true" tabindex="-1">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website"
+                       autocomplete="off" tabindex="-1">
+            </div>
 
             <div class="form-row">
                 <div class="form-group">
@@ -116,25 +122,21 @@
 <script>
 function validateForm() {
     let valid = true;
-
     const name = document.getElementById('name');
     const email = document.getElementById('email');
     const message = document.getElementById('message');
 
-    // Reset errores
     ['nameError', 'emailError', 'messageError'].forEach(id => {
         document.getElementById(id).textContent = '';
     });
     [name, email, message].forEach(el => el.classList.remove('input-error'));
 
-    // Nombre
     if (!name.value.trim() || name.value.trim().length < 2) {
         document.getElementById('nameError').textContent = 'Introduce tu nombre (mínimo 2 caracteres)';
         name.classList.add('input-error');
         valid = false;
     }
 
-    // Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
         document.getElementById('emailError').textContent = 'Introduce un email válido';
@@ -142,7 +144,6 @@ function validateForm() {
         valid = false;
     }
 
-    // Mensaje
     if (!message.value.trim() || message.value.trim().length < 10) {
         document.getElementById('messageError').textContent = 'El mensaje debe tener al menos 10 caracteres';
         message.classList.add('input-error');
@@ -150,7 +151,6 @@ function validateForm() {
     }
 
     if (valid) {
-        // Deshabilitar botón para evitar doble envío
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.textContent = 'Enviando...';
