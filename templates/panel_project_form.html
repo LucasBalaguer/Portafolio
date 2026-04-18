@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,201 +10,240 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg: #07070d;
-            --surface: #0f0f18;
-            --border: #1a1a28;
-            --border2: #222235;
-            --accent: #7c6af7;
-            --accent-dim: rgba(124,106,247,0.12);
-            --text: #e2e2f0;
-            --muted: #50507a;
-            --muted2: #7070a0;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Sora', sans-serif;
+            --font-sans: 'Sora', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --accent: #2563eb;
+            --accent3: #ef4444;
+            --transition: 0.25s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-grad-start: #0f172a;
+            --bg-grad-mid: #111c2e;
+            --bg-grad-end: #0a0f1e;
+            --card-bg: rgba(255,255,255,0.05);
+            --card-border: rgba(255,255,255,0.08);
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            --topbar-bg: rgba(15,23,42,0.85);
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --text-muted2: #94a3b8;
+            --input-bg: rgba(255,255,255,0.05);
+            --input-border: rgba(255,255,255,0.1);
+            --input-focus-bg: rgba(37,99,235,0.08);
+            --divider: rgba(255,255,255,0.06);
+            --btn-secondary-bg: rgba(255,255,255,0.06);
+            --btn-secondary-border: rgba(255,255,255,0.1);
+        }
+
+        [data-theme="light"] {
+            --bg-grad-start: #eef3f9;
+            --bg-grad-mid: #e8eef6;
+            --bg-grad-end: #dde5f1;
+            --card-bg: rgba(255,255,255,0.65);
+            --card-border: rgba(255,255,255,0.4);
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            --topbar-bg: rgba(238,243,249,0.85);
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --text-muted2: #9ca3af;
+            --input-bg: rgba(255,255,255,0.7);
+            --input-border: rgba(0,0,0,0.12);
+            --input-focus-bg: rgba(37,99,235,0.04);
+            --divider: rgba(0,0,0,0.06);
+            --btn-secondary-bg: rgba(0,0,0,0.04);
+            --btn-secondary-border: rgba(0,0,0,0.1);
         }
 
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--sans);
+            font-family: var(--font-sans);
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-mid), var(--bg-grad-end));
+            color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 3rem 1rem;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.08) 0%, transparent 60%);
+        }
+
+        /* TOPBAR */
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--topbar-bg);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem; height: 58px;
+            transition: background var(--transition), border-color var(--transition);
+        }
+
+        .topbar-brand {
+            font-family: var(--font-mono); font-size: 0.78rem;
+            font-weight: 600; color: var(--accent); letter-spacing: 0.08em;
+        }
+
+        .topbar-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+        .topbar-link {
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--text-muted2); text-decoration: none;
+            padding: 0.35rem 0.75rem; border-radius: var(--radius-sm);
+            transition: color var(--transition), background var(--transition);
+        }
+        .topbar-link:hover { color: var(--text-main); background: var(--btn-secondary-bg); }
+
+        .theme-toggle {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--btn-secondary-bg);
+            border: 1px solid var(--btn-secondary-border);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; color: var(--text-main);
+            transition: background var(--transition), transform 0.15s;
+        }
+        .theme-toggle:hover { transform: scale(1.08); }
+
+        /* FORM LAYOUT */
+        .page {
+            max-width: 680px; margin: 0 auto;
+            padding: 2.5rem 1.5rem 5rem;
+            position: relative; z-index: 2;
         }
 
         .form-card {
-            width: 100%;
-            max-width: 640px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--card-shadow);
             padding: 2.5rem 2rem;
+            transition: background var(--transition), border-color var(--transition);
         }
 
         .form-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 2rem;
         }
 
-        h1 {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
+        .form-title { font-size: 1.1rem; font-weight: 600; }
 
-        .back-link {
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            color: var(--muted2);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover { color: var(--text); }
-
+        /* SECTION DIVIDER */
         .section-divider {
-            font-family: var(--mono);
-            font-size: 0.65rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin: 2rem 0 1.25rem;
+            font-family: var(--font-mono); font-size: 0.62rem;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.15em; margin: 2rem 0 1.25rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--divider);
         }
 
+        /* FORM GROUPS */
         .form-group { margin-bottom: 1.25rem; }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
 
         label {
             display: block;
-            font-family: var(--mono);
-            font-size: 0.68rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 0.5rem;
+            font-family: var(--font-mono); font-size: 0.65rem;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.12em; margin-bottom: 0.5rem;
         }
 
         input, textarea {
             width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--border2);
-            border-radius: 8px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: var(--radius-sm);
             padding: 0.75rem 1rem;
-            color: var(--text);
-            font-family: var(--sans);
-            font-size: 0.9rem;
+            color: var(--text-main);
+            font-family: var(--font-sans); font-size: 0.9rem;
             outline: none;
-            transition: border-color 0.2s, background 0.2s;
+            transition: border-color var(--transition), background var(--transition);
         }
+
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
 
         input:focus, textarea:focus {
             border-color: var(--accent);
-            background: var(--accent-dim);
+            background: var(--input-focus-bg);
         }
 
         textarea { resize: vertical; min-height: 100px; }
         textarea.tall { min-height: 130px; }
 
         .hint {
-            font-family: var(--mono);
-            font-size: 0.65rem;
-            color: var(--muted);
-            margin-top: 0.35rem;
-            line-height: 1.5;
+            font-family: var(--font-mono); font-size: 0.63rem;
+            color: var(--text-muted); margin-top: 0.35rem; line-height: 1.55;
         }
 
-        .hint a {
-            color: var(--accent);
-            text-decoration: none;
+        code {
+            background: rgba(37,99,235,0.12);
+            padding: 0.1rem 0.4rem; border-radius: 4px;
+            font-family: var(--font-mono); font-size: 0.85em;
         }
 
-        /* Imagen preview */
+        /* IMAGE FIELDS */
         .img-field-wrap {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            display: flex; align-items: center; gap: 0.75rem;
             margin-bottom: 0.75rem;
         }
 
-        .img-field-wrap input {
-            flex: 1;
-            margin-bottom: 0;
+        .img-field-wrap input { flex: 1; margin-bottom: 0; }
+
+        .img-num {
+            font-family: var(--font-mono); font-size: 0.62rem;
+            color: var(--text-muted); width: 16px; flex-shrink: 0; text-align: right;
         }
 
         .img-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 6px;
-            border: 1px solid var(--border2);
-            object-fit: cover;
-            display: none;          /* se muestra con JS cuando la URL es válida */
-            flex-shrink: 0;
+            width: 80px; height: 80px; border-radius: 6px;
+            border: 1px solid var(--input-border);
+            object-fit: cover; display: none; flex-shrink: 0;
         }
 
-        .img-num {
-            font-family: var(--mono);
-            font-size: 0.65rem;
-            color: var(--muted);
-            width: 16px;
-            flex-shrink: 0;
-            text-align: right;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 2rem;
-        }
+        /* FORM ACTIONS */
+        .form-actions { display: flex; gap: 0.75rem; margin-top: 2rem; }
 
         .btn-submit {
-            flex: 1;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 0.85rem;
-            font-family: var(--sans);
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s;
+            flex: 1; background: var(--accent); color: #fff;
+            border: none; border-radius: var(--radius-sm); padding: 0.85rem;
+            font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: opacity 0.2s, transform 0.15s;
         }
-
-        .btn-submit:hover { opacity: 0.87; }
+        .btn-submit:hover { opacity: 0.87; transform: translateY(-1px); }
 
         .btn-cancel {
-            background: transparent;
-            border: 1px solid var(--border2);
-            border-radius: 8px;
-            padding: 0.85rem 1.5rem;
-            color: var(--muted2);
-            font-family: var(--sans);
-            font-size: 0.9rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            transition: border-color 0.2s, color 0.2s;
+            background: var(--btn-secondary-bg);
+            border: 1px solid var(--btn-secondary-border);
+            border-radius: var(--radius-sm); padding: 0.85rem 1.5rem;
+            color: var(--text-muted2); font-family: var(--font-sans);
+            font-size: 0.9rem; cursor: pointer; text-decoration: none;
+            display: flex; align-items: center;
+            transition: border-color var(--transition), color var(--transition);
         }
-
-        .btn-cancel:hover { border-color: var(--accent); color: var(--text); }
+        .btn-cancel:hover { border-color: var(--accent); color: var(--text-main); }
     </style>
 </head>
 <body>
+
+<header class="topbar">
+    <div class="topbar-brand">PANEL · {{ action | upper }} PROYECTO</div>
+    <div class="topbar-actions">
+        <a href="{{ url_for('panel_dashboard', token=token) }}" class="topbar-link">← Dashboard</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">☀</button>
+    </div>
+</header>
+
+<main class="page">
     <div class="form-card">
+
         <div class="form-header">
-            <h1>{{ action }} proyecto</h1>
-            <a href="{{ url_for('panel_dashboard', token=token) }}" class="back-link">← Volver al panel</a>
+            <h1 class="form-title">{{ action }} proyecto</h1>
         </div>
 
         <form method="POST">
@@ -219,7 +258,9 @@
             </div>
 
             <div class="form-group">
-                <label for="description">Descripción corta * <span style="font-size:0.6rem;opacity:0.6">(aparece en la tarjeta de proyectos)</span></label>
+                <label for="description">Descripción corta *
+                    <span style="font-size:0.6rem;opacity:0.6">(aparece en la tarjeta)</span>
+                </label>
                 <textarea id="description" name="description" required>{{ project.description if project else '' }}</textarea>
             </div>
 
@@ -260,42 +301,36 @@
             </div>
 
             <!-- CONTENIDO DETALLE -->
-            <p class="section-divider">Contenido del detalle del proyecto</p>
+            <p class="section-divider">Contenido del detalle</p>
 
             <div class="form-group">
                 <label for="problem">El problema</label>
                 <textarea id="problem" name="problem" class="tall"
-                          placeholder="¿Qué problema resolvía este proyecto? ¿Cuál era el objetivo?">{{ project.problem if project else '' }}</textarea>
+                          placeholder="¿Qué problema resolvía este proyecto?">{{ project.problem if project else '' }}</textarea>
             </div>
 
             <div class="form-group">
                 <label for="process">Proceso</label>
                 <textarea id="process" name="process" class="tall"
-                          placeholder="¿Cómo lo abordaste? Pasos, metodología, decisiones...">{{ project.process if project else '' }}</textarea>
+                          placeholder="¿Cómo lo abordaste?">{{ project.process if project else '' }}</textarea>
             </div>
 
             <div class="form-group">
                 <label for="results">Resultados</label>
                 <textarea id="results" name="results" class="tall"
-                          placeholder="¿Qué conseguiste? Métricas, conclusiones, aprendizajes...">{{ project.results if project else '' }}</textarea>
+                          placeholder="¿Qué conseguiste?">{{ project.results if project else '' }}</textarea>
             </div>
 
             <!-- IMÁGENES -->
-            <p class="section-divider">Imágenes del proyecto <span style="font-weight:400;opacity:0.6">(opcional · máx. 5)</span></p>
-
-            <p class="hint" style="margin-bottom:1.25rem">
-                Sube las imágenes a tu repositorio en
-                <code style="background:rgba(124,106,247,0.15);padding:0.1rem 0.4rem;border-radius:4px">static/img/projects/</code>
-                y pega aquí la URL raw de GitHub.<br>
-                Formato: <code style="background:rgba(124,106,247,0.15);padding:0.1rem 0.4rem;border-radius:4px">https://raw.githubusercontent.com/LucasBalaguer/&lt;repo&gt;/main/static/img/projects/nombre.png</code>
+            <p class="section-divider">Imágenes
+                <span style="font-weight:400;opacity:0.6">(opcional · máx. 5)</span>
             </p>
 
-            {#
-                Aquí dividimos las URLs guardadas en la BD (separadas por comas)
-                en una lista para rellenar cada campo individual.
-                Si el proyecto es nuevo, la lista está vacía.
-                zip_longest nos permite iterar hasta 5 aunque haya menos URLs guardadas.
-            #}
+            <p class="hint" style="margin-bottom:1.25rem">
+                Sube las imágenes al repo y pega la URL raw de GitHub.<br>
+                Formato: <code>https://raw.githubusercontent.com/LucasBalaguer/&lt;repo&gt;/main/ruta/imagen.png</code>
+            </p>
+
             {% set img_list = project.images.split(',') if project and project.images else [] %}
 
             {% for i in range(1, 6) %}
@@ -304,19 +339,14 @@
                 <div class="img-field-wrap">
                     <span class="img-num">{{ i }}</span>
                     <input
-                        type="url"
-                        id="image_{{ i }}"
-                        name="image_{{ i }}"
+                        type="url" id="image_{{ i }}" name="image_{{ i }}"
                         value="{{ img_list[i-1] if img_list|length >= i else '' }}"
                         placeholder="https://raw.githubusercontent.com/..."
                         oninput="previewImg(this, 'prev_{{ i }}')"
                     >
-                    <img
-                        id="prev_{{ i }}"
-                        class="img-preview"
-                        src="{{ img_list[i-1] if img_list|length >= i else '' }}"
-                        alt="Preview imagen {{ i }}"
-                    >
+                    <img id="prev_{{ i }}" class="img-preview"
+                         src="{{ img_list[i-1] if img_list|length >= i else '' }}"
+                         alt="Preview {{ i }}">
                 </div>
             </div>
             {% endfor %}
@@ -328,32 +358,43 @@
 
         </form>
     </div>
+</main>
 
-    <script>
-        // Muestra una miniatura de la imagen en tiempo real
-        // mientras el usuario escribe/pega la URL.
-        // Si la URL no carga (error 404, etc.) oculta la preview.
-        function previewImg(input, previewId) {
-            const preview = document.getElementById(previewId);
-            const url = input.value.trim();
-            if (url) {
-                preview.src = url;
-                preview.style.display = 'block';
-                preview.onerror = () => { preview.style.display = 'none'; };
-            } else {
-                preview.style.display = 'none';
-            }
+<script>
+    // Preview de imágenes
+    function previewImg(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const url = input.value.trim();
+        if (url) {
+            preview.src = url;
+            preview.style.display = 'block';
+            preview.onerror = () => { preview.style.display = 'none'; };
+        } else {
+            preview.style.display = 'none';
         }
+    }
 
-        // Al cargar la página, mostrar previews de imágenes ya guardadas
-        document.addEventListener('DOMContentLoaded', () => {
-            for (let i = 1; i <= 5; i++) {
-                const input = document.getElementById(`image_${i}`);
-                if (input && input.value.trim()) {
-                    previewImg(input, `prev_${i}`);
-                }
-            }
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+        for (let i = 1; i <= 5; i++) {
+            const input = document.getElementById(`image_${i}`);
+            if (input && input.value.trim()) previewImg(input, `prev_${i}`);
+        }
+    });
+
+    // Theme toggle — sincronizado con el resto del panel
+    const html  = document.documentElement;
+    const btn   = document.getElementById('themeToggle');
+    const KEY   = 'panel-theme';
+    const saved = localStorage.getItem(KEY) || 'dark';
+    html.setAttribute('data-theme', saved);
+    btn.textContent = saved === 'dark' ? '☀' : '🌙';
+    btn.addEventListener('click', () => {
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem(KEY, next);
+        btn.textContent = next === 'dark' ? '☀' : '🌙';
+    });
+</script>
+
 </body>
 </html>

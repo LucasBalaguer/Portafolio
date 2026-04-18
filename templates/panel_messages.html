@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,213 +10,219 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg: #07070d;
-            --surface: #0f0f18;
-            --surface2: #14141f;
-            --border: #1a1a28;
-            --border2: #222235;
-            --accent: #7c6af7;
-            --accent2: #4ecca3;
-            --accent3: #f05e7a;
-            --text: #e2e2f0;
-            --muted: #50507a;
-            --muted2: #7070a0;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Sora', sans-serif;
+            --font-sans: 'Sora', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --accent: #2563eb;
+            --accent2: #10b981;
+            --accent3: #ef4444;
+            --transition: 0.25s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-grad-start: #0f172a;
+            --bg-grad-mid: #111c2e;
+            --bg-grad-end: #0a0f1e;
+            --card-bg: rgba(255,255,255,0.05);
+            --card-border: rgba(255,255,255,0.08);
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            --card-border-unread: rgba(37,99,235,0.5);
+            --topbar-bg: rgba(15,23,42,0.85);
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --text-muted2: #94a3b8;
+            --table-border: rgba(255,255,255,0.06);
+            --btn-secondary-bg: rgba(255,255,255,0.06);
+            --btn-secondary-border: rgba(255,255,255,0.1);
+        }
+
+        [data-theme="light"] {
+            --bg-grad-start: #eef3f9;
+            --bg-grad-mid: #e8eef6;
+            --bg-grad-end: #dde5f1;
+            --card-bg: rgba(255,255,255,0.65);
+            --card-border: rgba(255,255,255,0.4);
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            --card-border-unread: rgba(37,99,235,0.4);
+            --topbar-bg: rgba(238,243,249,0.85);
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --text-muted2: #9ca3af;
+            --table-border: rgba(0,0,0,0.06);
+            --btn-secondary-bg: rgba(0,0,0,0.04);
+            --btn-secondary-border: rgba(0,0,0,0.1);
         }
 
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--sans);
+            font-family: var(--font-sans);
+            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-mid), var(--bg-grad-end));
+            color: var(--text-main);
             min-height: 100vh;
+            transition: background var(--transition), color var(--transition);
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.08) 0%, transparent 60%);
+        }
+
+        /* TOPBAR */
         .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(7,7,13,0.85);
+            position: sticky; top: 0; z-index: 100;
+            background: var(--topbar-bg);
             backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            height: 56px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem; height: 58px;
+            transition: background var(--transition), border-color var(--transition);
         }
 
         .topbar-brand {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            color: var(--accent);
-            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+            font-size: 0.78rem; font-weight: 600;
+            color: var(--accent); letter-spacing: 0.08em;
         }
 
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .topbar-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+        .topbar-link {
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--text-muted2); text-decoration: none;
+            padding: 0.35rem 0.75rem; border-radius: var(--radius-sm);
+            transition: color var(--transition), background var(--transition);
         }
 
-        .topbar-actions a {
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            color: var(--muted2);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
+        .topbar-link:hover { color: var(--text-main); background: var(--btn-secondary-bg); }
+        .topbar-link.danger:hover { color: var(--accent3); background: rgba(239,68,68,0.08); }
 
-        .topbar-actions a:hover { color: var(--text); }
-
-        .page {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem 4rem;
+        .theme-toggle {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--btn-secondary-bg);
+            border: 1px solid var(--btn-secondary-border);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            transition: background var(--transition), transform 0.15s;
+            color: var(--text-main);
         }
+        .theme-toggle:hover { transform: scale(1.08); }
+
+        /* PAGE */
+        .page { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 5rem; position: relative; z-index: 2; }
 
         .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.75rem;
         }
 
-        .section-title {
-            font-family: var(--mono);
-            font-size: 0.68rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
+        .section-label {
+            font-family: var(--font-mono); font-size: 0.65rem;
+            color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em;
         }
 
+        /* FLASH */
         .flash {
-            background: rgba(78, 204, 163, 0.1);
-            border: 1px solid rgba(78, 204, 163, 0.3);
-            border-radius: 8px;
+            background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: var(--radius-sm);
             color: var(--accent2);
-            font-family: var(--mono);
-            font-size: 0.78rem;
-            padding: 0.6rem 1rem;
-            margin-bottom: 1.5rem;
+            font-family: var(--font-mono); font-size: 0.78rem;
+            padding: 0.65rem 1rem; margin-bottom: 1.5rem;
         }
 
+        /* EMPTY */
         .empty-state {
-            text-align: center;
-            padding: 4rem 0;
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            color: var(--muted);
+            text-align: center; padding: 5rem 0;
+            font-family: var(--font-mono); font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
-        .message-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        /* MESSAGE CARDS */
+        .message-list { display: flex; flex-direction: column; gap: 1rem; }
 
         .message-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--card-shadow);
             padding: 1.5rem;
-            transition: border-color 0.2s;
-        }
-
-        .message-card.unread {
-            border-color: var(--accent);
+            transition: border-color var(--transition), transform 0.2s, box-shadow 0.2s;
         }
 
         .message-card:hover {
-            border-color: var(--border2);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12);
         }
+
+        .message-card.unread { border-color: var(--card-border-unread); }
 
         .message-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            gap: 1rem;
+            display: flex; align-items: flex-start;
+            justify-content: space-between; margin-bottom: 0.75rem; gap: 1rem;
         }
 
-        .message-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
+        .message-meta { display: flex; flex-direction: column; gap: 0.2rem; }
 
-        .message-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
+        .message-name { font-weight: 600; font-size: 0.95rem; }
 
         .message-email {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            color: var(--accent);
+            font-family: var(--font-mono); font-size: 0.7rem;
+            color: var(--accent); text-decoration: none;
         }
 
+        .message-email:hover { text-decoration: underline; }
+
         .message-date {
-            font-family: var(--mono);
-            font-size: 0.68rem;
-            color: var(--muted);
-            white-space: nowrap;
+            font-family: var(--font-mono); font-size: 0.65rem;
+            color: var(--text-muted); white-space: nowrap;
         }
 
         .message-subject {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--muted2);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.78rem; font-weight: 600;
+            color: var(--text-muted2); margin-bottom: 0.5rem;
+            text-transform: uppercase; letter-spacing: 0.05em;
         }
 
         .message-body {
-            font-size: 0.9rem;
-            color: var(--text);
-            line-height: 1.6;
-            white-space: pre-wrap;
+            font-size: 0.9rem; color: var(--text-main);
+            line-height: 1.65; white-space: pre-wrap;
         }
 
         .message-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
+            display: flex; gap: 1rem; margin-top: 1rem;
+            padding-top: 1rem; border-top: 1px solid var(--table-border);
+            align-items: center;
         }
 
         .message-actions a {
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            color: var(--accent);
-            text-decoration: none;
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--accent); text-decoration: none;
+            padding: 0.3rem 0.75rem; border-radius: var(--radius-sm);
+            background: rgba(37,99,235,0.1);
+            transition: background var(--transition);
         }
 
+        .message-actions a:hover { background: rgba(37,99,235,0.2); }
+
         .btn-delete {
-            background: none;
-            border: none;
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            color: var(--muted2);
-            cursor: pointer;
-            padding: 0;
-            transition: color 0.2s;
+            background: none; border: none;
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--text-muted); cursor: pointer; padding: 0;
+            transition: color var(--transition); margin-left: auto;
         }
 
         .btn-delete:hover { color: var(--accent3); }
 
         .unread-badge {
-            display: inline-block;
-            background: var(--accent);
-            color: #fff;
-            font-family: var(--mono);
-            font-size: 0.6rem;
-            padding: 0.15rem 0.45rem;
-            border-radius: 999px;
-            margin-left: 0.5rem;
-            vertical-align: middle;
+            display: inline-block; background: var(--accent); color: #fff;
+            font-family: var(--font-mono); font-size: 0.58rem;
+            padding: 0.15rem 0.45rem; border-radius: 999px;
+            margin-left: 0.5rem; vertical-align: middle;
         }
     </style>
 </head>
@@ -225,30 +231,28 @@
 <header class="topbar">
     <div class="topbar-brand">PANEL · MENSAJES</div>
     <div class="topbar-actions">
-        <a href="{{ url_for('panel_dashboard', token=token) }}">← Dashboard</a>
-        <a href="{{ url_for('panel_logout', token=token) }}">Cerrar sesión</a>
+        <a href="{{ url_for('panel_dashboard', token=token) }}" class="topbar-link">← Dashboard</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">☀</button>
+        <a href="{{ url_for('panel_logout', token=token) }}" class="topbar-link danger">Salir</a>
     </div>
 </header>
 
 <main class="page">
 
     {% with msgs = get_flashed_messages() %}
-        {% if msgs %}
-            {% for m in msgs %}
-            <div class="flash">✓ {{ m }}</div>
-            {% endfor %}
-        {% endif %}
+        {% if msgs %}{% for m in msgs %}
+        <div class="flash">✓ {{ m }}</div>
+        {% endfor %}{% endif %}
     {% endwith %}
 
     <div class="page-header">
-        <p class="section-title">Mensajes de contacto · {{ messages | length }} total</p>
+        <p class="section-label">Mensajes de contacto · {{ messages | length }} total</p>
     </div>
 
     {% if messages %}
     <div class="message-list">
         {% for msg in messages %}
         <div class="message-card {% if not msg.read %}unread{% endif %}">
-
             <div class="message-header">
                 <div class="message-meta">
                     <span class="message-name">
@@ -257,9 +261,7 @@
                     </span>
                     <a href="mailto:{{ msg.email }}" class="message-email">{{ msg.email }}</a>
                 </div>
-                <span class="message-date">
-                    {{ msg.sent_at.strftime('%d/%m/%Y %H:%M') }}
-                </span>
+                <span class="message-date">{{ msg.sent_at.strftime('%d/%m/%Y %H:%M') }}</span>
             </div>
 
             {% if msg.subject %}
@@ -278,7 +280,6 @@
                     <button type="submit" class="btn-delete">Eliminar</button>
                 </form>
             </div>
-
         </div>
         {% endfor %}
     </div>
@@ -291,5 +292,21 @@
     {% endif %}
 
 </main>
+
+<script>
+    const html = document.documentElement;
+    const btn  = document.getElementById('themeToggle');
+    const KEY  = 'panel-theme';
+    const saved = localStorage.getItem(KEY) || 'dark';
+    html.setAttribute('data-theme', saved);
+    btn.textContent = saved === 'dark' ? '☀' : '🌙';
+    btn.addEventListener('click', () => {
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem(KEY, next);
+        btn.textContent = next === 'dark' ? '☀' : '🌙';
+    });
+</script>
+
 </body>
 </html>
