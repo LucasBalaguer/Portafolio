@@ -38,6 +38,45 @@
     {% endif %}
 </section>
 
+{#
+    CARRUSEL DE IMÁGENES
+    Solo se renderiza si el proyecto tiene imágenes guardadas.
+    project.images es un string de URLs separadas por comas.
+    Con split(',') lo convertimos en lista y filtramos strings vacíos
+    por si acaso quedó alguna coma suelta al guardar.
+    Si la lista queda vacía, el bloque entero no se muestra.
+#}
+{% if project.images %}
+    {% set img_list = project.images.split(',') | select('ne', '') | list %}
+    {% if img_list %}
+    <section class="project-carousel fade-in-section">
+        <div class="carousel-track" id="carouselTrack">
+            {% for img_url in img_list %}
+            <div class="carousel-slide {% if loop.first %}active{% endif %}">
+                <img src="{{ img_url }}" alt="Imagen {{ loop.index }} del proyecto {{ project.title }}" loading="lazy">
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if img_list | length > 1 %}
+        <div class="carousel-controls">
+            <button class="carousel-btn" id="prevBtn" aria-label="Imagen anterior">←</button>
+            <div class="carousel-dots" id="carouselDots">
+                {% for img_url in img_list %}
+                <button
+                    class="dot {% if loop.first %}active{% endif %}"
+                    data-index="{{ loop.index0 }}"
+                    aria-label="Ir a imagen {{ loop.index }}"
+                ></button>
+                {% endfor %}
+            </div>
+            <button class="carousel-btn" id="nextBtn" aria-label="Imagen siguiente">→</button>
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+{% endif %}
+
 {% if project.problem %}
 <section class="project-section fade-in-section">
     <h2>El problema</h2>
@@ -86,5 +125,139 @@
     </a>
     {% endif %}
 </nav>
+
+<style>
+/* =====================================================
+   CARRUSEL DE IMÁGENES
+===================================================== */
+
+.project-carousel {
+    max-width: 860px;
+    margin: 0 auto 3.5rem;
+    padding: 0 1.5rem;
+}
+
+.carousel-track {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.04);
+    aspect-ratio: 16 / 9;   /* proporción fija para que no salte al cambiar imagen */
+}
+
+.carousel-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;   /* contain para que no recorte los gráficos */
+    border-radius: 14px;
+}
+
+.carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.carousel-btn {
+    background: var(--bg-card);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-main);
+    transition: background 0.2s, transform 0.15s;
+    backdrop-filter: blur(8px);
+}
+
+.carousel-btn:hover {
+    background: var(--accent);
+    color: white;
+    transform: scale(1.05);
+}
+
+.carousel-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.2);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    padding: 0;
+}
+
+.dot.active {
+    background: var(--accent);
+    transform: scale(1.3);
+}
+
+body.dark .dot { background: rgba(255,255,255,0.2); }
+body.dark .dot.active { background: var(--accent); }
+
+@media (max-width: 600px) {
+    .project-carousel { padding: 0 1.25rem; }
+    .carousel-btn { width: 32px; height: 32px; font-size: 0.85rem; }
+}
+</style>
+
+<script>
+(function () {
+    // Solo ejecutamos si hay carrusel en la página
+    const track = document.getElementById('carouselTrack');
+    if (!track) return;
+
+    const slides = track.querySelectorAll('.carousel-slide');
+    if (slides.length <= 1) return;  // con 1 sola imagen no hay controles
+
+    const dots = document.querySelectorAll('#carouselDots .dot');
+    let current = 0;
+
+    function goTo(index) {
+        // Quitamos 'active' de la slide y del dot actuales
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+
+        // Calculamos el nuevo índice con módulo para que sea circular
+        // Ejemplo: si estamos en la última y pulsamos siguiente → vuelve a la primera
+        current = (index + slides.length) % slides.length;
+
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
+    document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+
+    // Cada punto lleva directamente a su índice
+    dots.forEach(dot => {
+        dot.addEventListener('click', () => goTo(parseInt(dot.dataset.index)));
+    });
+})();
+</script>
 
 {% endblock %}

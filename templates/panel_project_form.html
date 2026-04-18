@@ -120,6 +120,44 @@
             font-size: 0.65rem;
             color: var(--muted);
             margin-top: 0.35rem;
+            line-height: 1.5;
+        }
+
+        .hint a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Imagen preview */
+        .img-field-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .img-field-wrap input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .img-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 1px solid var(--border2);
+            object-fit: cover;
+            display: none;          /* se muestra con JS cuando la URL es válida */
+            flex-shrink: 0;
+        }
+
+        .img-num {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--muted);
+            width: 16px;
+            flex-shrink: 0;
+            text-align: right;
         }
 
         .form-actions {
@@ -242,6 +280,47 @@
                           placeholder="¿Qué conseguiste? Métricas, conclusiones, aprendizajes...">{{ project.results if project else '' }}</textarea>
             </div>
 
+            <!-- IMÁGENES -->
+            <p class="section-divider">Imágenes del proyecto <span style="font-weight:400;opacity:0.6">(opcional · máx. 5)</span></p>
+
+            <p class="hint" style="margin-bottom:1.25rem">
+                Sube las imágenes a tu repositorio en
+                <code style="background:rgba(124,106,247,0.15);padding:0.1rem 0.4rem;border-radius:4px">static/img/projects/</code>
+                y pega aquí la URL raw de GitHub.<br>
+                Formato: <code style="background:rgba(124,106,247,0.15);padding:0.1rem 0.4rem;border-radius:4px">https://raw.githubusercontent.com/LucasBalaguer/&lt;repo&gt;/main/static/img/projects/nombre.png</code>
+            </p>
+
+            {#
+                Aquí dividimos las URLs guardadas en la BD (separadas por comas)
+                en una lista para rellenar cada campo individual.
+                Si el proyecto es nuevo, la lista está vacía.
+                zip_longest nos permite iterar hasta 5 aunque haya menos URLs guardadas.
+            #}
+            {% set img_list = project.images.split(',') if project and project.images else [] %}
+
+            {% for i in range(1, 6) %}
+            <div class="form-group">
+                <label>Imagen {{ i }}</label>
+                <div class="img-field-wrap">
+                    <span class="img-num">{{ i }}</span>
+                    <input
+                        type="url"
+                        id="image_{{ i }}"
+                        name="image_{{ i }}"
+                        value="{{ img_list[i-1] if img_list|length >= i else '' }}"
+                        placeholder="https://raw.githubusercontent.com/..."
+                        oninput="previewImg(this, 'prev_{{ i }}')"
+                    >
+                    <img
+                        id="prev_{{ i }}"
+                        class="img-preview"
+                        src="{{ img_list[i-1] if img_list|length >= i else '' }}"
+                        alt="Preview imagen {{ i }}"
+                    >
+                </div>
+            </div>
+            {% endfor %}
+
             <div class="form-actions">
                 <a href="{{ url_for('panel_dashboard', token=token) }}" class="btn-cancel">Cancelar</a>
                 <button type="submit" class="btn-submit">{{ action }} proyecto</button>
@@ -249,5 +328,32 @@
 
         </form>
     </div>
+
+    <script>
+        // Muestra una miniatura de la imagen en tiempo real
+        // mientras el usuario escribe/pega la URL.
+        // Si la URL no carga (error 404, etc.) oculta la preview.
+        function previewImg(input, previewId) {
+            const preview = document.getElementById(previewId);
+            const url = input.value.trim();
+            if (url) {
+                preview.src = url;
+                preview.style.display = 'block';
+                preview.onerror = () => { preview.style.display = 'none'; };
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Al cargar la página, mostrar previews de imágenes ya guardadas
+        document.addEventListener('DOMContentLoaded', () => {
+            for (let i = 1; i <= 5; i++) {
+                const input = document.getElementById(`image_${i}`);
+                if (input && input.value.trim()) {
+                    previewImg(input, `prev_${i}`);
+                }
+            }
+        });
+    </script>
 </body>
 </html>

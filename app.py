@@ -52,6 +52,7 @@ class Project(db.Model):
     problem = db.Column(db.Text)
     process = db.Column(db.Text)
     results = db.Column(db.Text)
+    images = db.Column(db.Text)  # URLs separadas por comas, máx 5
 
     def __repr__(self):
         return f"<Project {self.title}>"
@@ -148,6 +149,19 @@ def track_visit(page: str):
             db.session.commit()
     except Exception:
         db.session.rollback()
+
+def collect_images_from_form() -> str:
+    """
+    Recoge image_1 … image_5 del formulario POST,
+    descarta los vacíos y devuelve un string separado por comas.
+    Ejemplo resultado: "https://raw.github.../g1.png,https://..."
+    """
+    urls = []
+    for i in range(1, 6):
+        url = request.form.get(f"image_{i}", "").strip()
+        if url:
+            urls.append(url)
+    return ",".join(urls)
 
 
 # ----------------------------
@@ -614,6 +628,7 @@ def panel_create_project(token):
             problem=request.form.get("problem"),
             process=request.form.get("process"),
             results=request.form.get("results"),
+            images=collect_images_from_form(),
         ))
         db.session.commit()
         flash("Proyecto creado correctamente")
@@ -638,6 +653,7 @@ def panel_edit_project(token, id):
         project.problem = request.form.get("problem")
         project.process = request.form.get("process")
         project.results = request.form.get("results")
+        project.images = collect_images_from_form()
         db.session.commit()
         flash("Proyecto actualizado correctamente")
         return redirect(url_for("panel_dashboard", token=token))
