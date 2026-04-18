@@ -71,19 +71,6 @@ class PageVisit(db.Model):
         return f"<PageVisit {self.page} {self.visit_date}>"
 
 
-class ContactMessage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    email = db.Column(db.String(200), nullable=False)
-    subject = db.Column(db.String(300))
-    message = db.Column(db.Text, nullable=False)
-    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
-    read = db.Column(db.Boolean, default=False)
-
-    def __repr__(self):
-        return f"<ContactMessage {self.name} {self.sent_at}>"
-
-
 # ----------------------------
 # DECORADORES
 # ----------------------------
