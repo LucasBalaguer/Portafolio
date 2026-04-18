@@ -31,3 +31,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+# .py
+app_images_snippet.py
+check_db.py
+migrate_add_contact_messages.py
+migrate_add_content_fields.py
+migrate_add_images.py
+migrate_add_sender_ip.py
+seed_db.py
