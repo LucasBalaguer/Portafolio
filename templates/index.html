@@ -28,11 +28,16 @@ Lucas Balaguer | Analista de Datos
             <a href="{{ url_for('contacto') }}" class="btn-secondary">
                 Contactar
             </a>
+
+            <a href="{{ url_for('static', filename='img/Lucas_Cavalcante_CV.pdf') }}"
+               download
+               class="btn-secondary">
+                Descargar CV
+            </a>
         </div>
 
     </div>
 
-    <!-- PROYECTOS RECIENTES — dinámicos desde BD -->
     {% if recent_projects %}
     <div class="projects-floating">
 
