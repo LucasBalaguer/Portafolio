@@ -1,81 +1,200 @@
 {% extends "base.html" %}
 
 {% block title %}Skills | Lucas Balaguer{% endblock %}
-{% block description %}Habilidades técnicas de Lucas Balaguer: Python, Pandas, Scikit-learn, Machine Learning, SQL y más.{% endblock %}
+{% block description %}Habilidades técnicas de Lucas Balaguer: Python, Machine Learning, Deep Learning, IA Generativa, SQL, EDA y más.{% endblock %}
 
 {% block content %}
 
 <section class="skills-hero">
     <h1>Habilidades</h1>
     <p>
-        Tecnologías y competencias que utilizo para analizar datos,
-        construir modelos y comunicar resultados de forma clara.
+        Tecnologías y competencias adquiridas a lo largo del bootcamp de
+        Data Science & IA y proyectos propios, organizadas por área.
     </p>
 </section>
 
 <section class="skills-section">
-    <div class="skills-grid">
+
+    <!-- ================================================
+         BLOQUE 1 — ANÁLISIS DE DATOS
+    ================================================ -->
+    <div class="skills-block-title fade-slide">📊 Análisis de Datos</div>
+    <div class="skills-grid" style="margin-bottom: 3rem;">
 
         <div class="skill-card fade-slide">
-            <h2>📊 Análisis de Datos</h2>
+            <h2>Exploración y EDA</h2>
             <ul>
-                <li>Exploratory Data Analysis (EDA)</li>
-                <li>Limpieza y transformación de datos</li>
-                <li>Visualización con Matplotlib & Seaborn</li>
-                <li>Análisis estadístico descriptivo</li>
+                <li>Análisis exploratorio de datos (EDA)</li>
+                <li>Limpieza y preprocesamiento</li>
+                <li>Detección de outliers y valores nulos</li>
+                <li>Análisis estadístico descriptivo e inferencial</li>
             </ul>
         </div>
 
         <div class="skill-card fade-slide">
-            <h2>🤖 Machine Learning</h2>
+            <h2>Visualización</h2>
             <ul>
-                <li>Modelos supervisados</li>
-                <li>Regresión y clasificación</li>
-                <li>Optimización de hiperparámetros</li>
-                <li>Validación cruzada</li>
+                <li>Matplotlib y Seaborn</li>
+                <li>Visualización avanzada y storytelling</li>
+                <li>Comunicación visual de resultados</li>
+                <li>Diseño de dashboards y gráficos</li>
             </ul>
         </div>
 
         <div class="skill-card fade-slide">
-            <h2>🐍 Python</h2>
+            <h2>Acceso a Datos</h2>
             <ul>
-                <li>Pandas, NumPy</li>
-                <li>Scikit-learn</li>
-                <li>Jupyter Notebooks</li>
-                <li>Automatización de análisis</li>
+                <li>SQL (consultas complejas, joins, subqueries)</li>
+                <li>Introducción a NoSQL</li>
+                <li>Consumo de APIs REST</li>
+                <li>Web Scraping (extracción de datos web)</li>
             </ul>
         </div>
 
         <div class="skill-card fade-slide">
-            <h2>🗄️ Bases de Datos</h2>
+            <h2>Feature Engineering</h2>
             <ul>
-                <li>SQL (consultas complejas)</li>
-                <li>Diseño de esquemas simples</li>
-                <li>Extracción y carga de datos</li>
-            </ul>
-        </div>
-
-        <div class="skill-card fade-slide">
-            <h2>🛠️ Herramientas</h2>
-            <ul>
-                <li>Git & GitHub</li>
-                <li>VS Code</li>
-                <li>Flask (apps simples)</li>
-                <li>Entornos de análisis</li>
-            </ul>
-        </div>
-
-        <div class="skill-card fade-slide">
-            <h2>🧠 Soft Skills</h2>
-            <ul>
-                <li>Comunicación de resultados</li>
-                <li>Pensamiento analítico</li>
-                <li>Orientación a negocio</li>
-                <li>Aprendizaje continuo</li>
+                <li>Selección de características</li>
+                <li>Codificación de variables categóricas</li>
+                <li>Escalado y normalización</li>
+                <li>Creación de nuevas variables</li>
             </ul>
         </div>
 
     </div>
+
+    <!-- ================================================
+         BLOQUE 2 — MACHINE LEARNING
+    ================================================ -->
+    <div class="skills-block-title fade-slide">🤖 Machine Learning</div>
+    <div class="skills-grid" style="margin-bottom: 3rem;">
+
+        <div class="skill-card fade-slide">
+            <h2>Aprendizaje Supervisado</h2>
+            <ul>
+                <li>Regresión (lineal, Ridge, Lasso)</li>
+                <li>Clasificación binaria y multiclase</li>
+                <li>Random Forest, XGBoost, LightGBM</li>
+                <li>Regresión logística y KNN</li>
+            </ul>
+        </div>
+
+        <div class="skill-card fade-slide">
+            <h2>Aprendizaje No Supervisado</h2>
+            <ul>
+                <li>Clustering (K-Means, DBSCAN)</li>
+                <li>Reducción de dimensionalidad (PCA)</li>
+                <li>Análisis de componentes principales</li>
+                <li>Segmentación de datos</li>
+            </ul>
+        </div>
+
+        <div class="skill-card fade-slide">
+            <h2>Evaluación y Optimización</h2>
+            <ul>
+                <li>Métricas: accuracy, recall, F1, AUC-ROC</li>
+                <li>Validación cruzada (StratifiedKFold)</li>
+                <li>GridSearchCV y RandomizedSearchCV</li>
+                <li>Ajuste de umbral de decisión</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- ================================================
+         BLOQUE 3 — DEEP LEARNING & IA
+    ================================================ -->
+    <div class="skills-block-title fade-slide">🧠 Deep Learning & IA</div>
+    <div class="skills-grid" style="margin-bottom: 3rem;">
+
+        <div class="skill-card fade-slide">
+            <h2>Redes Neuronales</h2>
+            <ul>
+                <li>Fundamentos de redes neuronales (ANN)</li>
+                <li>Redes convolucionales (CNN)</li>
+                <li>Redes recurrentes (RNN, LSTM)</li>
+                <li>Funciones de activación y backpropagation</li>
+            </ul>
+        </div>
+
+        <div class="skill-card fade-slide">
+            <h2>Transfer Learning & IA Generativa</h2>
+            <ul>
+                <li>Transfer learning con modelos preentrenados</li>
+                <li>Fine-tuning de modelos</li>
+                <li>Introducción a IA Generativa</li>
+                <li>Fundamentos de LLMs</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- ================================================
+         BLOQUE 4 — STACK TÉCNICO
+    ================================================ -->
+    <div class="skills-block-title fade-slide">🛠️ Stack Técnico</div>
+    <div class="skills-grid" style="margin-bottom: 3rem;">
+
+        <div class="skill-card fade-slide">
+            <h2>Python</h2>
+            <ul>
+                <li>Pandas, NumPy, SciPy</li>
+                <li>Scikit-learn, LightGBM, XGBoost</li>
+                <li>Matplotlib, Seaborn</li>
+                <li>Jupyter Notebooks</li>
+            </ul>
+        </div>
+
+        <div class="skill-card fade-slide">
+            <h2>Despliegue y APIs</h2>
+            <ul>
+                <li>FastAPI (APIs REST)</li>
+                <li>Flask (aplicaciones web)</li>
+                <li>Render (despliegue en producción)</li>
+                <li>Serialización de modelos (pickle)</li>
+            </ul>
+        </div>
+
+        <div class="skill-card fade-slide">
+            <h2>Entorno y Herramientas</h2>
+            <ul>
+                <li>Git y GitHub</li>
+                <li>VS Code</li>
+                <li>Entornos virtuales (venv)</li>
+                <li>SQL (PostgreSQL, SQLite)</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- ================================================
+         BLOQUE 5 — SOFT SKILLS
+    ================================================ -->
+    <div class="skills-block-title fade-slide">💬 Habilidades Transversales</div>
+    <div class="skills-grid" style="margin-bottom: 1rem;">
+
+        <div class="skill-card fade-slide">
+            <h2>Comunicación de Resultados</h2>
+            <ul>
+                <li>Storytelling con datos</li>
+                <li>Presentación a perfiles no técnicos</li>
+                <li>Orientación a negocio y ROI</li>
+                <li>Documentación técnica clara</li>
+            </ul>
+        </div>
+
+        <div class="skill-card fade-slide">
+            <h2>Metodología</h2>
+            <ul>
+                <li>Pensamiento analítico y crítico</li>
+                <li>Definición de hipótesis y validación</li>
+                <li>Trabajo en equipo en proyectos de datos</li>
+                <li>Aprendizaje continuo y autónomo</li>
+            </ul>
+        </div>
+
+    </div>
+
 </section>
 
 {% endblock %}

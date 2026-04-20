@@ -334,6 +334,28 @@ body::after {
     box-shadow: var(--shadow-lg);
 }
 
+.skills-block-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.skills-block-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(0,0,0,0.08);
+    margin-left: 0.75rem;
+}
+
+body.dark .skills-block-title::after {
+    background: rgba(255,255,255,0.08);
+}
+
 /* =====================================================
    ANIMACIONES
 ===================================================== */
