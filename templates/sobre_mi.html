@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}Sobre mí | Lucas Balaguer{% endblock %}
+{% block description %}Analista de Datos con background en desarrollo fullstack y diseño web. Especializado en EDA, machine learning y comunicación de resultados.{% endblock %}
+
+{% block content %}
+
+<section class="about-page">
+
+    <!-- HERO -->
+    <div class="about-hero fade-slide">
+        <span class="about-kicker">SOBRE MÍ</span>
+        <h1>Analista de Datos<br><span class="about-subtitle">con background en desarrollo web</span></h1>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="about-grid">
+
+        <!-- COLUMNA IZQUIERDA — texto -->
+        <div class="about-content">
+
+            <div class="about-block fade-slide">
+                <p>
+                    Soy Lucas, analista de datos con formación en Data Science & IA
+                    por The Bridge (480h). Vengo del mundo del desarrollo fullstack
+                    y el diseño web, lo que me da una perspectiva diferente: entiendo
+                    tanto los datos como el producto final donde esos datos cobran vida.
+                </p>
+            </div>
+
+            <div class="about-block fade-slide">
+                <p>
+                    Mi camino hacia los datos no fue directo. Empecé en desarrollo web,
+                    pero en un momento en el que buscaba dar un paso más sólido
+                    profesionalmente, decidí apostar por los datos. Fue la mejor
+                    decisión que he tomado — descubrí un campo que combina lógica,
+                    curiosidad e impacto real en la toma de decisiones.
+                </p>
+            </div>
+
+            <div class="about-block fade-slide">
+                <p>
+                    Me especializo en análisis exploratorio, machine learning y
+                    comunicación de resultados. Pero también sé desplegar lo que
+                    construyo: este portfolio está desarrollado por mí con Flask y
+                    desplegado en producción. Para mí, un análisis que no se puede
+                    mostrar o explicar es un análisis incompleto.
+                </p>
+            </div>
+
+            <div class="about-block fade-slide">
+                <p>
+                    Busco un equipo donde los datos sean una herramienta real para
+                    tomar decisiones, no solo un departamento. Disponible en Tarragona
+                    en presencial o híbrido, y en remoto para el resto de España
+                    e internacional.
+                </p>
+            </div>
+
+            <!-- CTAs -->
+            <div class="about-actions fade-slide">
+                <a href="{{ url_for('projects') }}" class="btn-primary">Ver proyectos</a>
+                <a href="{{ url_for('contacto') }}" class="btn-secondary">Contactar</a>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA — datos rápidos -->
+        <div class="about-sidebar">
+
+            <div class="about-card fade-slide">
+                <span class="card-kicker">Formación</span>
+                <div class="about-item">
+                    <span class="item-icon">🎓</span>
+                    <div>
+                        <strong>Data Science & IA</strong>
+                        <span>The Bridge · 480h · 2025–2026</span>
+                    </div>
+                </div>
+                <div class="about-item">
+                    <span class="item-icon">💻</span>
+                    <div>
+                        <strong>Desarrollo Fullstack</strong>
+                        <span>Diseño web y desarrollo frontend/backend</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-card fade-slide">
+                <span class="card-kicker">Especialización</span>
+                <div class="about-tags">
+                    <span class="about-tag">EDA</span>
+                    <span class="about-tag">Machine Learning</span>
+                    <span class="about-tag">Python</span>
+                    <span class="about-tag">SQL</span>
+                    <span class="about-tag">Visualización</span>
+                    <span class="about-tag">FastAPI</span>
+                    <span class="about-tag">Deep Learning</span>
+                    <span class="about-tag">Flask</span>
+                </div>
+            </div>
+
+            <div class="about-card fade-slide">
+                <span class="card-kicker">Disponibilidad</span>
+                <div class="about-item">
+                    <span class="item-icon">📍</span>
+                    <div>
+                        <strong>Tarragona</strong>
+                        <span>Presencial · Híbrido</span>
+                    </div>
+                </div>
+                <div class="about-item">
+                    <span class="item-icon">🌐</span>
+                    <div>
+                        <strong>España e internacional</strong>
+                        <span>Remoto</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- LÍNEA DE TIEMPO / RECORRIDO -->
+    <div class="about-timeline-section fade-slide">
+        <h2 class="timeline-title">Recorrido</h2>
+        <div class="timeline">
+
+            <div class="timeline-item fade-slide">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-date">2025 – 2026</span>
+                    <strong>Bootcamp Data Science & IA · The Bridge</strong>
+                    <p>480 horas de formación intensiva en análisis de datos, machine learning,
+                    deep learning e IA generativa. Proyectos reales con datasets públicos.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item fade-slide">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-date">Antes</span>
+                    <strong>Desarrollo Fullstack y Diseño Web</strong>
+                    <p>Experiencia en desarrollo web frontend y backend, diseño de interfaces
+                    y despliegue de aplicaciones. Base técnica que complementa el perfil de datos.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item fade-slide">
+                <div class="timeline-dot active"></div>
+                <div class="timeline-content">
+                    <span class="timeline-date">Ahora</span>
+                    <strong>Buscando mi primer rol en datos</strong>
+                    <p>Aplicando todo lo aprendido en proyectos propios y buscando
+                    un equipo donde los datos marquen la diferencia.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<style>
+/* =====================================================
+   ABOUT PAGE
+===================================================== */
+
+.about-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 7rem 1.5rem 5rem;
+}
+
+/* HERO */
+.about-hero {
+    margin-bottom: 3.5rem;
+    animation: fadeUp 0.6s ease-out both;
+}
+
+.about-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.about-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.about-subtitle {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* GRID PRINCIPAL */
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 3rem;
+    margin-bottom: 4rem;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+/* BLOQUES DE TEXTO */
+.about-block {
+    margin-bottom: 1.5rem;
+}
+
+.about-block p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+}
+
+/* Énfasis en palabras clave */
+.about-block p strong {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.about-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+/* SIDEBAR CARDS */
+.about-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.about-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(14px);
+    border-radius: var(--radius-md);
+    padding: 1.4rem 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.card-kicker {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.about-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 0.85rem;
+}
+
+.about-item:last-child { margin-bottom: 0; }
+
+.item-icon {
+    font-size: 1rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.about-item strong {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.1rem;
+}
+
+.about-item span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* TAGS */
+.about-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.about-tag {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.06);
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+body.dark .about-tag {
+    background: rgba(255,255,255,0.08);
+}
+
+/* TIMELINE */
+.about-timeline-section {
+    border-top: 1px solid rgba(0,0,0,0.08);
+    padding-top: 3rem;
+}
+
+body.dark .about-timeline-section {
+    border-color: rgba(255,255,255,0.07);
+}
+
+.timeline-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+/* Línea vertical */
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: rgba(0,0,0,0.1);
+}
+
+body.dark .timeline::before {
+    background: rgba(255,255,255,0.08);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2.5rem;
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-dot {
+    position: absolute;
+    left: -1.65rem;
+    top: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid rgba(0,0,0,0.15);
+    backdrop-filter: blur(4px);
+}
+
+body.dark .timeline-dot {
+    border-color: rgba(255,255,255,0.15);
+}
+
+.timeline-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+}
+
+.timeline-content { padding-left: 0.25rem; }
+
+.timeline-date {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+
+.timeline-content strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+.timeline-content p {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+/* RESPONSIVE MOBILE */
+@media (max-width: 600px) {
+    .about-page { padding: 6rem 1.25rem 4rem; }
+    .about-actions { flex-direction: column; }
+    .about-actions .btn-primary,
+    .about-actions .btn-secondary { text-align: center; width: 100%; }
+}
+</style>
+
+{% endblock %}

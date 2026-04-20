@@ -402,6 +402,11 @@ def contacto():
 
     return render_template("contact.html", success=success, error=error)
 
+@app.route("/sobre-mi")
+def sobre_mi():
+    track_visit("sobre-mi")
+    return render_template("sobre-mi.html")
+
 
 # ----------------------------
 # RUTAS ADMIN

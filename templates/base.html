@@ -43,6 +43,7 @@
         <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="active"{% endif %}>Home</a>
         <a href="{{ url_for('projects') }}" {% if request.endpoint == 'projects' %}class="active"{% endif %}>Proyectos</a>
         <a href="{{ url_for('skills') }}" {% if request.endpoint == 'skills' %}class="active"{% endif %}>Skills</a>
+        <a href="{{ url_for('sobre_mi') }}" {% if request.endpoint == 'sobre_mi' %}class="active"{% endif %}>Sobre mí</a>
         <a href="{{ url_for('contacto') }}" {% if request.endpoint == 'contacto' %}class="active"{% endif %}>Contacto</a>
     </nav>
 
