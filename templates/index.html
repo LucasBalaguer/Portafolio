@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}
-Lucas Balaguer | Analista de Datos
-{% endblock %}
+{% block title %}Lucas Balaguer | Analista de Datos{% endblock %}
+
+{% block description %}Analista de Datos especializado en Python, Machine Learning y EDA. Background en desarrollo fullstack. Disponible en Tarragona y remoto.{% endblock %}
+{% block og_title %}Lucas Balaguer | Analista de Datos{% endblock %}
+{% block og_description %}Analista de Datos especializado en Python, Machine Learning y EDA. Background en desarrollo fullstack. Disponible en Tarragona y remoto.{% endblock %}
+{% block twitter_title %}Lucas Balaguer | Analista de Datos{% endblock %}
+{% block twitter_description %}Analista de Datos especializado en Python, Machine Learning y EDA. Background en desarrollo fullstack. Disponible en Tarragona y remoto.{% endblock %}
 
 {% block content %}
 
@@ -24,14 +28,11 @@ Lucas Balaguer | Analista de Datos
             <a href="{{ url_for('projects') }}" class="btn-primary">
                 Ver proyectos
             </a>
-
             <a href="{{ url_for('contacto') }}" class="btn-secondary">
                 Contactar
             </a>
-
             <a href="{{ url_for('static', filename='img/Lucas_Cavalcante_CV.pdf') }}"
-               download
-               class="btn-secondary">
+               download class="btn-secondary">
                 Descargar CV
             </a>
         </div>
@@ -40,9 +41,7 @@ Lucas Balaguer | Analista de Datos
 
     {% if recent_projects %}
     <div class="projects-floating">
-
         <span class="projects-label">Proyectos recientes</span>
-
         <div class="projects-mini-grid">
             {% for project in recent_projects %}
             <a href="{{ url_for('project_detail', slug=project.slug) }}"
@@ -52,7 +51,6 @@ Lucas Balaguer | Analista de Datos
             </a>
             {% endfor %}
         </div>
-
     </div>
     {% endif %}
 

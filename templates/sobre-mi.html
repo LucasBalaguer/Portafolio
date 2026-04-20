@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}Sobre mí | Lucas Balaguer{% endblock %}
-{% block description %}Analista de Datos con background en desarrollo fullstack y diseño web. Especializado en EDA, machine learning y comunicación de resultados.{% endblock %}
+
+{% block description %}Analista de Datos con background en desarrollo fullstack. Formado en Data Science & IA por The Bridge (480h). Disponible en Tarragona y remoto.{% endblock %}
+{% block og_title %}Sobre mí | Lucas Balaguer{% endblock %}
+{% block og_description %}Analista de Datos con background en desarrollo fullstack. Formado en Data Science & IA por The Bridge (480h). Disponible en Tarragona y remoto.{% endblock %}
+{% block twitter_title %}Sobre mí | Lucas Balaguer{% endblock %}
+{% block twitter_description %}Analista de Datos con background en desarrollo fullstack. Formado en Data Science & IA por The Bridge (480h). Disponible en Tarragona y remoto.{% endblock %}
 
 {% block content %}
 
@@ -18,6 +23,12 @@
 
         <!-- COLUMNA IZQUIERDA — texto -->
         <div class="about-content">
+
+            
+            <div class="about-photo fade-slide">
+                <img src="{{ url_for('static', filename='img/lucas_balaguer.jpg') }}"
+                     alt="Lucas Balaguer · Analista de Datos">
+            </div>
 
             <div class="about-block fade-slide">
                 <p>
@@ -61,10 +72,7 @@
             <div class="about-actions fade-slide">
                 <a href="{{ url_for('projects') }}" class="btn-primary">Ver proyectos</a>
                 <a href="{{ url_for('static', filename='img/Lucas_Cavalcante_CV.pdf') }}"
-                   download
-                   class="btn-secondary">
-                    Descargar CV
-                </a>
+                   download class="btn-secondary">Descargar CV</a>
                 <a href="{{ url_for('contacto') }}" class="btn-secondary">Contactar</a>
             </div>
 
@@ -72,6 +80,17 @@
 
         <!-- COLUMNA DERECHA — datos rápidos -->
         <div class="about-sidebar">
+
+            {#
+                FOTO en sidebar — alternativa si prefieres la foto aquí en vez de en el texto.
+                Descomenta cuando tengas la imagen.
+            #}
+            {#
+            <div class="about-card about-photo-card fade-slide">
+                <img src="{{ url_for('static', filename='img/lucas_balaguer.jpg') }}"
+                     alt="Lucas Balaguer" class="about-photo-img">
+            </div>
+            #}
 
             <div class="about-card fade-slide">
                 <span class="card-kicker">Formación</span>
@@ -197,10 +216,28 @@
 @media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; gap: 2rem; } }
 
 .about-block { margin-bottom: 1.5rem; }
-
 .about-block p { font-size: 1.05rem; line-height: 1.8; color: var(--text-muted); }
 
 .about-actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+
+/* FOTO */
+.about-photo { margin-bottom: 2rem; }
+
+.about-photo img {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(37,99,235,0.25);
+    box-shadow: var(--shadow-md);
+}
+
+.about-photo-card { padding: 1rem; }
+
+.about-photo-img {
+    width: 100%; aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+}
 
 .about-sidebar { display: flex; flex-direction: column; gap: 1rem; }
 

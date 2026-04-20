@@ -1,38 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}Proyectos · Lucas Cavalcante{% endblock %}
+{% block title %}Proyectos | Lucas Balaguer{% endblock %}
+
+{% block description %}Proyectos de análisis de datos y machine learning de Lucas Balaguer: EDA de vivienda y paro, predicción de infracciones de tráfico con LightGBM, API REST con FastAPI y más.{% endblock %}
+{% block og_title %}Proyectos | Lucas Balaguer{% endblock %}
+{% block og_description %}Proyectos de análisis de datos y machine learning de Lucas Balaguer: EDA de vivienda y paro, predicción de infracciones de tráfico con LightGBM, API REST con FastAPI y más.{% endblock %}
+{% block twitter_title %}Proyectos | Lucas Balaguer{% endblock %}
+{% block twitter_description %}Proyectos de análisis de datos y machine learning de Lucas Balaguer: EDA de vivienda y paro, predicción de infracciones de tráfico con LightGBM, API REST con FastAPI y más.{% endblock %}
 
 {% block content %}
 <section class="projects-section">
 
-    <!-- Header -->
     <div class="projects-header">
         <h1>Proyectos</h1>
         <p>
-            Una selección de proyectos personales y experimentales donde exploro
-            desarrollo web, diseño de interfaces y backend con Python.
+            Una selección de proyectos donde aplico análisis de datos,
+            machine learning y despliegue de modelos a problemas reales.
         </p>
     </div>
 
-    <!-- Grid de proyectos -->
     <div class="projects-grid">
-
         {% for project in projects %}
         <a href="{{ url_for('project_detail', slug=project.slug) }}"
             class="project-card fade-slide">
-
             <h3>{{ project.title }}</h3>
             <p>{{ project.description }}</p>
-
             {% if project.tech %}
             <div class="project-tags">
                 {{ project.tech }}
             </div>
             {% endif %}
-
         </a>
         {% endfor %}
-
     </div>
 
 </section>
