@@ -53,7 +53,8 @@ class Project(db.Model):
     process = db.Column(db.Text)
     results = db.Column(db.Text)
     images = db.Column(db.Text)  # URLs separadas por comas, máx 5
-
+    dashboard_url = db.Column(db.String(300)) 
+    
     def __repr__(self):
         return f"<Project {self.title}>"
 
