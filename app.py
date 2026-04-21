@@ -621,6 +621,7 @@ def panel_create_project(token):
             process=request.form.get("process"),
             results=request.form.get("results"),
             images=collect_images_from_form(),
+            dashboard_url=request.form.get("dashboard_url"),
         ))
         db.session.commit()
         flash("Proyecto creado correctamente")
@@ -646,6 +647,7 @@ def panel_edit_project(token, id):
         project.process = request.form.get("process")
         project.results = request.form.get("results")
         project.images = collect_images_from_form()
+        project.dashboard_url = request.form.get("dashboard_url")
         db.session.commit()
         flash("Proyecto actualizado correctamente")
         return redirect(url_for("panel_dashboard", token=token))

@@ -45,7 +45,6 @@
         <div class="carousel-track" id="carouselTrack">
             {% for img_url in img_list %}
             <div class="carousel-slide {% if loop.first %}active{% endif %}">
-                {# cursor:zoom-in indica visualmente que la imagen es clicable #}
                 <img
                     src="{{ img_url }}"
                     alt="Imagen {{ loop.index }} del proyecto {{ project.title }}"
@@ -76,8 +75,7 @@
     {% endif %}
 {% endif %}
 
-{# LIGHTBOX — overlay oscuro con imagen ampliada #}
-{# Está oculto por defecto, se activa con JS al clicar una imagen #}
+{# LIGHTBOX #}
 <div id="lightbox" aria-modal="true" role="dialog" aria-label="Imagen ampliada">
     <button id="lightboxClose" aria-label="Cerrar imagen">✕</button>
     <img id="lightboxImg" src="" alt="Imagen ampliada">
@@ -110,6 +108,11 @@
         Ver código en GitHub
     </a>
     {% endif %}
+    {% if project.dashboard_url %}
+    <a href="{{ project.dashboard_url }}" target="_blank" class="btn-secondary">
+        Ver dashboard →
+    </a>
+    {% endif %}
     <a href="{{ url_for('projects') }}" class="btn-secondary">
         Volver a proyectos
     </a>
@@ -136,7 +139,6 @@
 /* =====================================================
    CARRUSEL
 ===================================================== */
-
 .project-carousel {
     max-width: 860px;
     margin: 0 auto 3.5rem;
@@ -183,41 +185,24 @@
     background: var(--bg-card);
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 8px;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1rem;
-    color: var(--text-main);
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1rem; color: var(--text-main);
     transition: background 0.2s, transform 0.15s;
     backdrop-filter: blur(8px);
 }
 
-.carousel-btn:hover {
-    background: var(--accent);
-    color: white;
-    transform: scale(1.05);
-}
+.carousel-btn:hover { background: var(--accent); color: white; transform: scale(1.05); }
 
 .carousel-dots { display: flex; gap: 0.5rem; }
 
 .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.2);
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-    padding: 0;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(0,0,0,0.2); border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.2s; padding: 0;
 }
 
-.dot.active {
-    background: var(--accent);
-    transform: scale(1.3);
-}
+.dot.active { background: var(--accent); transform: scale(1.3); }
 
 body.dark .dot { background: rgba(255,255,255,0.2); }
 body.dark .dot.active { background: var(--accent); }
@@ -225,69 +210,37 @@ body.dark .dot.active { background: var(--accent); }
 /* =====================================================
    LIGHTBOX
 ===================================================== */
-
 #lightbox {
-    /* Ocupa toda la pantalla por encima de todo lo demás */
     display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.88);
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.88);
     backdrop-filter: blur(6px);
-
-    /* Centra la imagen horizontal y verticalmente */
-    align-items: center;
-    justify-content: center;
-
-    opacity: 0;
-    transition: opacity 0.25s ease;
+    align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.25s ease;
 }
 
-#lightbox.active {
-    display: flex;
-    opacity: 1;
-}
+#lightbox.active { display: flex; opacity: 1; }
 
 #lightboxImg {
-    max-width: 90vw;
-    max-height: 88vh;
-    object-fit: contain;
-    border-radius: 10px;
+    max-width: 90vw; max-height: 88vh;
+    object-fit: contain; border-radius: 10px;
     box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-
-    /* Pequeña animación de escala al abrir */
-    transform: scale(0.95);
-    transition: transform 0.25s ease;
+    transform: scale(0.95); transition: transform 0.25s ease;
 }
 
-#lightbox.active #lightboxImg {
-    transform: scale(1);
-}
+#lightbox.active #lightboxImg { transform: scale(1); }
 
-/* Botón X — esquina superior derecha */
 #lightboxClose {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.5rem;
+    position: absolute; top: 1.25rem; right: 1.5rem;
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    z-index: 10000;
+    border-radius: 50%; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1rem; cursor: pointer;
+    transition: background 0.2s, transform 0.15s; z-index: 10000;
 }
 
-#lightboxClose:hover {
-    background: rgba(255,255,255,0.25);
-    transform: scale(1.1);
-}
+#lightboxClose:hover { background: rgba(255,255,255,0.25); transform: scale(1.1); }
 
 @media (max-width: 600px) {
     .project-carousel { padding: 0 1.25rem; }
@@ -298,16 +251,12 @@ body.dark .dot.active { background: var(--accent); }
 </style>
 
 <script>
-/* =====================================================
-   CARRUSEL
-===================================================== */
+/* CARRUSEL */
 (function () {
     const track = document.getElementById('carouselTrack');
     if (!track) return;
-
     const slides = track.querySelectorAll('.carousel-slide');
     if (slides.length <= 1) return;
-
     const dots = document.querySelectorAll('#carouselDots .dot');
     let current = 0;
 
@@ -326,31 +275,25 @@ body.dark .dot.active { background: var(--accent); }
     });
 })();
 
-/* =====================================================
-   LIGHTBOX
-===================================================== */
+/* LIGHTBOX */
 (function () {
     const lightbox    = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
     const closeBtn    = document.getElementById('lightboxClose');
-
     if (!lightbox) return;
 
     function openLightbox(src, alt) {
         lightboxImg.src = src;
         lightboxImg.alt = alt;
         lightbox.style.display = 'flex';
-        // Doble requestAnimationFrame para que el navegador aplique
-        // display:flex antes de añadir la clase .active que dispara la transición CSS
         requestAnimationFrame(() => {
             requestAnimationFrame(() => lightbox.classList.add('active'));
         });
-        document.body.style.overflow = 'hidden'; // bloquea el scroll de fondo
+        document.body.style.overflow = 'hidden';
     }
 
     function closeLightbox() {
         lightbox.classList.remove('active');
-        // Esperamos a que termine la transición de opacidad antes de ocultar del todo
         lightbox.addEventListener('transitionend', function handler() {
             lightbox.style.display = 'none';
             lightboxImg.src = '';
@@ -359,24 +302,14 @@ body.dark .dot.active { background: var(--accent); }
         });
     }
 
-    // Clic en cualquier imagen del carrusel → abrir lightbox
     document.querySelectorAll('.zoomable').forEach(img => {
         img.addEventListener('click', () => openLightbox(img.src, img.alt));
     });
 
-    // Cerrar con la X
     closeBtn.addEventListener('click', closeLightbox);
-
-    // Cerrar clicando el fondo oscuro (solo si el clic fue en el overlay, no en la imagen)
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
-
-    // Cerrar con la tecla Escape
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
-            closeLightbox();
-        }
+        if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox();
     });
 })();
 </script>
