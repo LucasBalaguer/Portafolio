@@ -635,14 +635,14 @@ body.dark .skills-block-title::after {
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 12px;
-    color: #1f2933;
+    color: var(--text-main);
 }
 
 /* DESCRIPCIÓN */
 .projects-header p {
     font-size: 1.1rem;
     line-height: 1.6;
-    color: #4b5563;
+    color: var(--text-muted);
 }
 
 

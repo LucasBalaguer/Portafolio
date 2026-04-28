@@ -46,8 +46,9 @@
             {% for project in recent_projects %}
             <a href="{{ url_for('project_detail', slug=project.slug) }}"
                class="mini-project"
-               title="{{ project.title }}">
-                {{ project.title | truncate(12, True, '') }}
+               data-title="{{ project.title }}">
+                {# Subimos el truncate de 12 a 20 para que se lean mejor #}
+                {{ project.title | truncate(20, True, '…') }}
             </a>
             {% endfor %}
         </div>
@@ -55,5 +56,97 @@
     {% endif %}
 
 </section>
+
+{#
+    Tooltip personalizado — más elegante que el title nativo del navegador.
+    Se crea un único elemento flotante que sigue al cursor entre los mini-project.
+    Más ligero que crear un tooltip por cada tarjeta.
+#}
+<div id="mini-tooltip"></div>
+
+<style>
+/* =====================================================
+   MINI-PROJECT — cuadros más anchos
+===================================================== */
+.mini-project {
+    width: auto;           /* antes era 64px fijo */
+    min-width: 80px;
+    max-width: 130px;
+    height: auto;
+    min-height: 56px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    text-align: center;
+}
+
+/* =====================================================
+   TOOLTIP
+===================================================== */
+#mini-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: var(--text-main);
+    color: var(--bg-main);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.45rem 0.8rem;
+    border-radius: 6px;
+    pointer-events: none;       /* no interfiere con los clics */
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+#mini-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Flecha inferior del tooltip */
+#mini-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--text-main);
+}
+</style>
+
+<script>
+(function () {
+    const tooltip = document.getElementById('mini-tooltip');
+    const cards   = document.querySelectorAll('.mini-project');
+
+    cards.forEach(card => {
+        const title = card.dataset.title;
+
+        card.addEventListener('mouseenter', (e) => {
+            tooltip.textContent = title;
+            tooltip.classList.add('visible');
+            positionTooltip(e);
+        });
+
+        card.addEventListener('mousemove', positionTooltip);
+
+        card.addEventListener('mouseleave', () => {
+            tooltip.classList.remove('visible');
+        });
+    });
+
+    function positionTooltip(e) {
+        // Colocamos el tooltip encima del cursor con un pequeño offset
+        const offset = 14;
+        tooltip.style.left = e.clientX - tooltip.offsetWidth / 2 + 'px';
+        tooltip.style.top  = e.clientY - tooltip.offsetHeight - offset + 'px';
+    }
+})();
+</script>
 
 {% endblock %}
