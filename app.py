@@ -53,9 +53,9 @@ class Project(db.Model):
     process = db.Column(db.Text)
     results = db.Column(db.Text)
     images = db.Column(db.Text)  # URLs separadas por comas, máx 5
-    dashboard_url = db.Column(db.String(300)) 
+    dashboard_url = db.Column(db.String(300))
     dashboard_url_2 = db.Column(db.String(300))
-    
+
     def __repr__(self):
         return f"<Project {self.title}>"
 
@@ -73,18 +73,24 @@ class PageVisit(db.Model):
         return f"<PageVisit {self.page} {self.visit_date}>"
 
 
+class ContactMessage(db.Model):
+    __tablename__ = "contact_message"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(300))
+    message = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)
+    sender_ip = db.Column(db.String(64))   # hash de la IP para rate limiting
+
+    def __repr__(self):
+        return f"<ContactMessage {self.name} {self.sent_at}>"
+
+
 # ----------------------------
 # DECORADORES
 # ----------------------------
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get("admin"):
-            return redirect(url_for("admin_login"))
-        return f(*args, **kwargs)
-    return decorated_function
-
 
 def panel_required(f):
     @wraps(f)
@@ -139,6 +145,7 @@ def track_visit(page: str):
     except Exception:
         db.session.rollback()
 
+
 def collect_images_from_form() -> str:
     """
     Recoge image_1 … image_5 del formulario POST,
@@ -175,9 +182,6 @@ def _check_rate_limit(ip: str) -> bool:
     ip_hash = _hash_ip(ip)
     window_start = datetime.utcnow() - timedelta(minutes=RATE_LIMIT_WINDOW)
 
-    # Contamos mensajes cuyo ip_hash coincida en la ventana de tiempo
-    # Como ContactMessage no almacena ip_hash, usamos una columna nueva
-    # que añadiremos al modelo a continuación
     recent_count = ContactMessage.query.filter(
         ContactMessage.sender_ip == ip_hash,
         ContactMessage.sent_at >= window_start
@@ -194,23 +198,6 @@ def _is_honeypot_filled() -> bool:
     Devuelve True si el bot ha caído en la trampa.
     """
     return bool(request.form.get("website", "").strip())
-
-
-# Modelo actualizado con sender_ip para rate limiting
-# (necesita migración si ya existe la tabla)
-class ContactMessage(db.Model):
-    __tablename__ = "contact_message"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    email = db.Column(db.String(200), nullable=False)
-    subject = db.Column(db.String(300))
-    message = db.Column(db.Text, nullable=False)
-    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
-    read = db.Column(db.Boolean, default=False)
-    sender_ip = db.Column(db.String(64))   # hash de la IP para rate limiting
-
-    def __repr__(self):
-        return f"<ContactMessage {self.name} {self.sent_at}>"
 
 
 # ----------------------------
@@ -322,14 +309,14 @@ def home():
 @app.route("/proyectos")
 def projects():
     track_visit("proyectos")
- 
+
     page = request.args.get("page", 1, type=int)
     per_page = 9
- 
+
     pagination = Project.query.order_by(Project.id.desc()).paginate(
         page=page, per_page=per_page, error_out=False
     )
- 
+
     return render_template(
         "proyectos.html",
         projects=pagination.items,   # los proyectos de esta página
@@ -379,7 +366,7 @@ def contacto():
 
         # 2. RATE LIMITING — máximo RATE_LIMIT_MAX mensajes por hora
         if not _check_rate_limit(ip):
-            error = f"Has enviado demasiados mensajes. Por favor espera un momento antes de volver a intentarlo."
+            error = "Has enviado demasiados mensajes. Por favor espera un momento antes de volver a intentarlo."
             return render_template("contact.html", success=False, error=error)
 
         name    = request.form.get("name", "").strip()
@@ -415,88 +402,11 @@ def contacto():
 
     return render_template("contact.html", success=success, error=error)
 
+
 @app.route("/sobre-mi")
 def sobre_mi():
     track_visit("sobre-mi")
     return render_template("sobre-mi.html")
-
-
-# ----------------------------
-# RUTAS ADMIN
-# ----------------------------
-
-@app.route("/admin/login", methods=["GET", "POST"])
-def admin_login():
-    if request.method == "POST":
-        if request.form.get("password") == os.getenv("ADMIN_PASSWORD"):
-            session["admin"] = True
-            return redirect(url_for("admin_dashboard"))
-    return render_template("admin_login.html")
-
-
-@app.route("/admin/logout")
-def admin_logout():
-    session.pop("admin", None)
-    return redirect(url_for("admin_login"))
-
-
-@app.route("/admin/dashboard")
-@admin_required
-def admin_dashboard():
-    return render_template("admin_dashboard.html", projects=Project.query.all())
-
-
-@app.route("/admin/project/new", methods=["GET", "POST"])
-@admin_required
-def admin_create_project():
-    if request.method == "POST":
-        db.session.add(Project(
-            title=request.form.get("title"),
-            description=request.form.get("description"),
-            slug=request.form.get("slug"),
-            role=request.form.get("role"),
-            tech=request.form.get("tech"),
-            duration=request.form.get("duration"),
-            github=request.form.get("github"),
-            problem=request.form.get("problem"),
-            process=request.form.get("process"),
-            results=request.form.get("results"),
-        ))
-        db.session.commit()
-        flash("Proyecto creado correctamente")
-        return redirect(url_for("admin_dashboard"))
-    return render_template("admin_project_form.html", action="Crear")
-
-
-@app.route("/admin/project/<int:id>/edit", methods=["GET", "POST"])
-@admin_required
-def admin_edit_project(id):
-    project = Project.query.get_or_404(id)
-    if request.method == "POST":
-        project.title = request.form.get("title")
-        project.description = request.form.get("description")
-        project.slug = request.form.get("slug")
-        project.role = request.form.get("role")
-        project.tech = request.form.get("tech")
-        project.duration = request.form.get("duration")
-        project.github = request.form.get("github")
-        project.problem = request.form.get("problem")
-        project.process = request.form.get("process")
-        project.results = request.form.get("results")
-        db.session.commit()
-        flash("Proyecto actualizado correctamente")
-        return redirect(url_for("admin_dashboard"))
-    return render_template("admin_project_form.html", project=project, action="Editar")
-
-
-@app.route("/admin/project/<int:id>/delete", methods=["POST"])
-@admin_required
-def admin_delete_project(id):
-    project = Project.query.get_or_404(id)
-    db.session.delete(project)
-    db.session.commit()
-    flash("Proyecto eliminado correctamente")
-    return redirect(url_for("admin_dashboard"))
 
 
 # ============================================================
@@ -680,6 +590,11 @@ def panel_delete_project(token, id):
     flash("Proyecto eliminado")
     return redirect(url_for("panel_dashboard", token=token))
 
+
+# ----------------------------
+# SEO — SITEMAP & ROBOTS
+# ----------------------------
+
 @app.route("/sitemap.xml")
 def sitemap():
     """
@@ -687,10 +602,8 @@ def sitemap():
     Las páginas fijas están hardcodeadas.
     Los proyectos se obtienen de la BD para que se actualicen solos.
     """
-    # URL base del sitio — cámbiala si cambias de dominio
     base_url = "https://www.lucascavalcante.es"
 
-    # Páginas fijas con su prioridad y frecuencia de cambio
     static_pages = [
         {"url": "/",          "priority": "1.0", "changefreq": "weekly"},
         {"url": "/sobre-mi",  "priority": "0.9", "changefreq": "monthly"},
@@ -699,10 +612,8 @@ def sitemap():
         {"url": "/contacto",  "priority": "0.6", "changefreq": "yearly"},
     ]
 
-    # Páginas dinámicas — proyectos
     projects = Project.query.all()
 
-    # Construimos el XML manualmente (no necesita librerías externas)
     xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
 
@@ -723,9 +634,6 @@ def sitemap():
     xml_lines.append("</urlset>")
 
     xml_content = "\n".join(xml_lines)
-
-    # Devolvemos el XML con el content-type correcto para que
-    # Google lo reconozca como sitemap
     return Response(xml_content, mimetype="application/xml")
 
 
@@ -735,13 +643,11 @@ def robots():
     Sirve el robots.txt.
     Allow: / → permite indexar todo el sitio.
     Disallow: /panel/ → bloquea el panel privado.
-    Disallow: /admin/ → bloquea el admin legacy.
     Sitemap → le dice a Google dónde está el sitemap.
     """
     content = """User-agent: *
 Allow: /
 Disallow: /panel/
-Disallow: /admin/
 
 Sitemap: https://www.lucascavalcante.es/sitemap.xml
 """
