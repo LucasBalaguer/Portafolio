@@ -34,5 +34,130 @@
         {% endfor %}
     </div>
 
+    {# ============================================
+       PAGINACIÓN
+       Solo se muestra si hay más de una página.
+       pagination.pages = número total de páginas.
+    ============================================ #}
+    {% if pagination and pagination.pages > 1 %}
+    <nav class="pagination" aria-label="Navegación de proyectos">
+
+        {# Botón ANTERIOR — deshabilitado si estamos en la primera página #}
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('projects', page=pagination.prev_num) }}"
+           class="page-btn page-arrow">‹ Anterior</a>
+        {% else %}
+        <span class="page-btn page-arrow disabled">‹ Anterior</span>
+        {% endif %}
+
+        {# NÚMEROS DE PÁGINA
+           iter_pages() genera la secuencia de números con "…" para saltos.
+           Ej: 1 2 3 … 8 9   cuando hay muchas páginas. #}
+        <div class="page-numbers">
+            {% for p in pagination.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+                {% if p %}
+                    {% if p == pagination.page %}
+                    <span class="page-num active">{{ p }}</span>
+                    {% else %}
+                    <a href="{{ url_for('projects', page=p) }}" class="page-num">{{ p }}</a>
+                    {% endif %}
+                {% else %}
+                    <span class="page-dots">…</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {# Botón SIGUIENTE — deshabilitado si estamos en la última página #}
+        {% if pagination.has_next %}
+        <a href="{{ url_for('projects', page=pagination.next_num) }}"
+           class="page-btn page-arrow">Siguiente ›</a>
+        {% else %}
+        <span class="page-btn page-arrow disabled">Siguiente ›</span>
+        {% endif %}
+
+    </nav>
+    {% endif %}
+
 </section>
+
+<style>
+/* =====================================================
+   PAGINACIÓN
+===================================================== */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 3.5rem auto 2rem;
+    flex-wrap: wrap;
+}
+
+.page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.page-btn, .page-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main);
+    border-radius: var(--radius-sm);
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+/* Botones anterior / siguiente */
+.page-arrow {
+    padding: 0.5rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+body.dark .page-arrow {
+    border-color: rgba(255,255,255,0.1);
+}
+
+.page-arrow:hover:not(.disabled) {
+    background: var(--accent);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.page-arrow.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Números de página */
+.page-num {
+    width: 36px;
+    height: 36px;
+}
+
+.page-num:hover {
+    background: var(--bg-card);
+}
+
+.page-num.active {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+}
+
+.page-dots {
+    color: var(--text-muted);
+    padding: 0 0.25rem;
+}
+
+@media (max-width: 600px) {
+    .pagination { gap: 0.5rem; }
+    .page-arrow { padding: 0.5rem 0.75rem; font-size: 0.8rem; }
+    .page-num { width: 32px; height: 32px; font-size: 0.8rem; }
+}
+</style>
 {% endblock %}

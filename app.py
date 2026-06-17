@@ -322,8 +322,19 @@ def home():
 @app.route("/proyectos")
 def projects():
     track_visit("proyectos")
-    all_projects = Project.query.all()
-    return render_template("proyectos.html", projects=all_projects)
+ 
+    page = request.args.get("page", 1, type=int)
+    per_page = 9
+ 
+    pagination = Project.query.order_by(Project.id.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+ 
+    return render_template(
+        "proyectos.html",
+        projects=pagination.items,   # los proyectos de esta página
+        pagination=pagination,       # el objeto completo para los controles
+    )
 
 
 @app.route("/projects/<slug>")

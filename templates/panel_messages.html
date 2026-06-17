@@ -6,112 +6,9 @@
     <title>Panel · Mensajes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --font-sans: 'Sora', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --radius-sm: 8px;
-            --radius-md: 14px;
-            --accent: #2563eb;
-            --accent2: #10b981;
-            --accent3: #ef4444;
-            --transition: 0.25s ease;
-        }
-
-        [data-theme="dark"] {
-            --bg-grad-start: #0f172a;
-            --bg-grad-mid: #111c2e;
-            --bg-grad-end: #0a0f1e;
-            --card-bg: rgba(255,255,255,0.05);
-            --card-border: rgba(255,255,255,0.08);
-            --card-shadow: 0 8px 32px rgba(0,0,0,0.35);
-            --card-border-unread: rgba(37,99,235,0.5);
-            --topbar-bg: rgba(15,23,42,0.85);
-            --text-main: #e2e8f0;
-            --text-muted: #64748b;
-            --text-muted2: #94a3b8;
-            --table-border: rgba(255,255,255,0.06);
-            --btn-secondary-bg: rgba(255,255,255,0.06);
-            --btn-secondary-border: rgba(255,255,255,0.1);
-        }
-
-        [data-theme="light"] {
-            --bg-grad-start: #eef3f9;
-            --bg-grad-mid: #e8eef6;
-            --bg-grad-end: #dde5f1;
-            --card-bg: rgba(255,255,255,0.65);
-            --card-border: rgba(255,255,255,0.4);
-            --card-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            --card-border-unread: rgba(37,99,235,0.4);
-            --topbar-bg: rgba(238,243,249,0.85);
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --text-muted2: #9ca3af;
-            --table-border: rgba(0,0,0,0.06);
-            --btn-secondary-bg: rgba(0,0,0,0.04);
-            --btn-secondary-border: rgba(0,0,0,0.1);
-        }
-
-        body {
-            font-family: var(--font-sans);
-            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-mid), var(--bg-grad-end));
-            color: var(--text-main);
-            min-height: 100vh;
-            transition: background var(--transition), color var(--transition);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.08) 0%, transparent 60%);
-        }
-
-        /* TOPBAR */
-        .topbar {
-            position: sticky; top: 0; z-index: 100;
-            background: var(--topbar-bg);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--card-border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 2rem; height: 58px;
-            transition: background var(--transition), border-color var(--transition);
-        }
-
-        .topbar-brand {
-            font-family: var(--font-mono);
-            font-size: 0.78rem; font-weight: 600;
-            color: var(--accent); letter-spacing: 0.08em;
-        }
-
-        .topbar-actions { display: flex; align-items: center; gap: 0.75rem; }
-
-        .topbar-link {
-            font-family: var(--font-mono); font-size: 0.72rem;
-            color: var(--text-muted2); text-decoration: none;
-            padding: 0.35rem 0.75rem; border-radius: var(--radius-sm);
-            transition: color var(--transition), background var(--transition);
-        }
-
-        .topbar-link:hover { color: var(--text-main); background: var(--btn-secondary-bg); }
-        .topbar-link.danger:hover { color: var(--accent3); background: rgba(239,68,68,0.08); }
-
-        .theme-toggle {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: var(--btn-secondary-bg);
-            border: 1px solid var(--btn-secondary-border);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
-            transition: background var(--transition), transform 0.15s;
-            color: var(--text-main);
-        }
-        .theme-toggle:hover { transform: scale(1.08); }
-
-        /* PAGE */
+        /* Solo estilos específicos de mensajes */
         .page { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 5rem; position: relative; z-index: 2; }
 
         .page-header {
@@ -119,29 +16,6 @@
             margin-bottom: 1.75rem;
         }
 
-        .section-label {
-            font-family: var(--font-mono); font-size: 0.65rem;
-            color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em;
-        }
-
-        /* FLASH */
-        .flash {
-            background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.25);
-            border-radius: var(--radius-sm);
-            color: var(--accent2);
-            font-family: var(--font-mono); font-size: 0.78rem;
-            padding: 0.65rem 1rem; margin-bottom: 1.5rem;
-        }
-
-        /* EMPTY */
-        .empty-state {
-            text-align: center; padding: 5rem 0;
-            font-family: var(--font-mono); font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* MESSAGE CARDS */
         .message-list { display: flex; flex-direction: column; gap: 1rem; }
 
         .message-card {
@@ -154,11 +28,7 @@
             transition: border-color var(--transition), transform 0.2s, box-shadow 0.2s;
         }
 
-        .message-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.12);
-        }
-
+        .message-card:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
         .message-card.unread { border-color: var(--card-border-unread); }
 
         .message-header {
@@ -167,14 +37,12 @@
         }
 
         .message-meta { display: flex; flex-direction: column; gap: 0.2rem; }
-
         .message-name { font-weight: 600; font-size: 0.95rem; }
 
         .message-email {
             font-family: var(--font-mono); font-size: 0.7rem;
             color: var(--accent); text-decoration: none;
         }
-
         .message-email:hover { text-decoration: underline; }
 
         .message-date {
@@ -203,10 +71,8 @@
             font-family: var(--font-mono); font-size: 0.72rem;
             color: var(--accent); text-decoration: none;
             padding: 0.3rem 0.75rem; border-radius: var(--radius-sm);
-            background: rgba(37,99,235,0.1);
-            transition: background var(--transition);
+            background: rgba(37,99,235,0.1); transition: background var(--transition);
         }
-
         .message-actions a:hover { background: rgba(37,99,235,0.2); }
 
         .btn-delete {
@@ -215,15 +81,9 @@
             color: var(--text-muted); cursor: pointer; padding: 0;
             transition: color var(--transition); margin-left: auto;
         }
-
         .btn-delete:hover { color: var(--accent3); }
 
-        .unread-badge {
-            display: inline-block; background: var(--accent); color: #fff;
-            font-family: var(--font-mono); font-size: 0.58rem;
-            padding: 0.15rem 0.45rem; border-radius: 999px;
-            margin-left: 0.5rem; vertical-align: middle;
-        }
+        .empty-state-lg { text-align: center; padding: 5rem 0; }
     </style>
 </head>
 <body>
@@ -246,7 +106,7 @@
     {% endwith %}
 
     <div class="page-header">
-        <p class="section-label">Mensajes de contacto · {{ messages | length }} total</p>
+        <p class="section-label" style="margin:0;border:none;">Mensajes de contacto · {{ messages | length }} total</p>
     </div>
 
     {% if messages %}
@@ -283,9 +143,8 @@
         </div>
         {% endfor %}
     </div>
-
     {% else %}
-    <div class="empty-state">
+    <div class="empty-state empty-state-lg">
         Todavía no hay mensajes.<br>
         Cuando alguien use el formulario de contacto, aparecerán aquí.
     </div>

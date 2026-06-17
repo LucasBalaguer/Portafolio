@@ -6,472 +6,146 @@
     <title>Panel · Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        /* =====================================================
-           VARIABLES — dark (default) y light
-        ===================================================== */
-        :root {
-            --font-sans: 'Sora', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --radius-sm: 8px;
-            --radius-md: 14px;
-            --radius-lg: 20px;
-            --accent: #2563eb;
-            --accent-light: rgba(37,99,235,0.15);
-            --accent2: #10b981;
-            --accent3: #ef4444;
-            --transition: 0.25s ease;
-        }
-
-        [data-theme="dark"] {
-            --bg-main: #0f172a;
-            --bg-grad-start: #0f172a;
-            --bg-grad-mid: #111c2e;
-            --bg-grad-end: #0a0f1e;
-            --card-bg: rgba(255,255,255,0.05);
-            --card-border: rgba(255,255,255,0.08);
-            --card-shadow: 0 8px 32px rgba(0,0,0,0.35);
-            --topbar-bg: rgba(15,23,42,0.85);
-            --text-main: #e2e8f0;
-            --text-muted: #64748b;
-            --text-muted2: #94a3b8;
-            --table-border: rgba(255,255,255,0.06);
-            --input-bg: rgba(255,255,255,0.05);
-            --input-border: rgba(255,255,255,0.1);
-            --chart-grid: rgba(255,255,255,0.04);
-            --chart-text: #475569;
-            --btn-secondary-bg: rgba(255,255,255,0.06);
-            --btn-secondary-border: rgba(255,255,255,0.1);
-        }
-
-        [data-theme="light"] {
-            --bg-main: #eef3f9;
-            --bg-grad-start: #eef3f9;
-            --bg-grad-mid: #e8eef6;
-            --bg-grad-end: #dde5f1;
-            --card-bg: rgba(255,255,255,0.65);
-            --card-border: rgba(255,255,255,0.4);
-            --card-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            --topbar-bg: rgba(238,243,249,0.85);
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --text-muted2: #9ca3af;
-            --table-border: rgba(0,0,0,0.06);
-            --input-bg: rgba(255,255,255,0.7);
-            --input-border: rgba(0,0,0,0.1);
-            --chart-grid: rgba(0,0,0,0.04);
-            --chart-text: #94a3b8;
-            --btn-secondary-bg: rgba(0,0,0,0.04);
-            --btn-secondary-border: rgba(0,0,0,0.1);
-        }
-
-        /* =====================================================
-           BASE
-        ===================================================== */
-        body {
-            font-family: var(--font-sans);
-            background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-mid), var(--bg-grad-end));
-            color: var(--text-main);
-            min-height: 100vh;
-            transition: background var(--transition), color var(--transition);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.08) 0%, transparent 60%);
-        }
+        /* Solo estilos específicos del dashboard.
+           Las variables, topbar, card, flash, theme-toggle, etc.
+           vienen de panel.css */
 
         body::after {
             content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
+            position: fixed; inset: 0; pointer-events: none; z-index: 1;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
         }
 
-        /* =====================================================
-           TOPBAR
-        ===================================================== */
-        .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--topbar-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--card-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            height: 58px;
-            transition: background var(--transition), border-color var(--transition);
-        }
-
-        .topbar-brand {
-            font-family: var(--font-mono);
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--accent);
-            letter-spacing: 0.08em;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .live-dot {
-            width: 7px; height: 7px;
-            background: var(--accent2);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .topbar-link {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            color: var(--text-muted2);
-            text-decoration: none;
-            padding: 0.35rem 0.75rem;
-            border-radius: var(--radius-sm);
-            transition: color var(--transition), background var(--transition);
-        }
-
-        .topbar-link:hover {
-            color: var(--text-main);
-            background: var(--btn-secondary-bg);
-        }
-
-        .topbar-link.danger:hover {
-            color: var(--accent3);
-            background: rgba(239,68,68,0.08);
-        }
-
-        /* Theme toggle */
-        .theme-toggle {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: var(--btn-secondary-bg);
-            border: 1px solid var(--btn-secondary-border);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            transition: background var(--transition), transform 0.15s;
-            color: var(--text-main);
-        }
-
-        .theme-toggle:hover { transform: scale(1.08); }
-
-        /* =====================================================
-           LAYOUT
-        ===================================================== */
         .page {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem 5rem;
-            position: relative;
-            z-index: 2;
+            max-width: 1200px; margin: 0 auto;
+            padding: 2rem 1.5rem 5rem; position: relative; z-index: 2;
         }
 
-        .section-label {
-            font-family: var(--font-mono);
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        /* =====================================================
-           GLASS CARD
-        ===================================================== */
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--card-shadow);
-            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
-        }
-
-        /* =====================================================
-           STAT CARDS
-        ===================================================== */
+        /* STAT CARDS */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 1rem; margin-bottom: 2rem;
         }
 
-        .stat-card {
-            padding: 1.4rem 1.6rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
-        }
+        .stat-card { padding: 1.4rem 1.6rem; transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.15); }
 
         .stat-label {
-            font-family: var(--font-mono);
-            font-size: 0.62rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 0.6rem;
+            font-family: var(--font-mono); font-size: 0.62rem;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.12em; margin-bottom: 0.6rem;
         }
 
-        .stat-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            line-height: 1;
-            color: var(--text-main);
-        }
-
+        .stat-value { font-size: 2.2rem; font-weight: 700; line-height: 1; color: var(--text-main); }
         .stat-value.blue  { color: var(--accent); }
         .stat-value.green { color: var(--accent2); }
 
         .stat-sub {
-            font-family: var(--font-mono);
-            font-size: 0.62rem;
-            color: var(--text-muted);
-            margin-top: 0.4rem;
+            font-family: var(--font-mono); font-size: 0.62rem;
+            color: var(--text-muted); margin-top: 0.4rem;
         }
 
-        /* =====================================================
-           CHARTS
-        ===================================================== */
+        .stat-card.clickable { cursor: pointer; }
+        .stat-card.clickable:hover { border-color: var(--accent); }
+
+        /* CHARTS */
         .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            display: grid; grid-template-columns: 2fr 1fr;
+            gap: 1rem; margin-bottom: 2rem;
         }
-
         @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
 
         .chart-card { padding: 1.5rem; }
 
         .chart-title {
-            font-family: var(--font-mono);
-            font-size: 0.68rem;
-            color: var(--text-muted2);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 1.25rem;
+            font-family: var(--font-mono); font-size: 0.68rem;
+            color: var(--text-muted2); text-transform: uppercase;
+            letter-spacing: 0.1em; margin-bottom: 1.25rem;
         }
 
         .chart-wrap { position: relative; height: 190px; }
 
-        /* =====================================================
-           TABLES
-        ===================================================== */
+        /* TABLES */
         .tables-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1rem; margin-bottom: 2rem;
         }
-
         @media (max-width: 768px) { .tables-grid { grid-template-columns: 1fr; } }
 
         .table-card { padding: 1.5rem; overflow: hidden; }
 
         .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
+            width: 100%; border-collapse: collapse;
+            font-family: var(--font-mono); font-size: 0.75rem;
         }
 
         .data-table th {
-            text-align: left;
-            color: var(--text-muted);
-            font-size: 0.62rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--table-border);
+            text-align: left; color: var(--text-muted);
+            font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em;
+            padding-bottom: 0.75rem; border-bottom: 1px solid var(--table-border);
         }
 
         .data-table td {
-            padding: 0.6rem 0;
-            color: var(--text-main);
+            padding: 0.6rem 0; color: var(--text-main);
             border-bottom: 1px solid var(--table-border);
         }
 
         .data-table tr:last-child td { border-bottom: none; }
-
-        .data-table td:last-child {
-            text-align: right;
-            color: var(--accent);
-            font-weight: 600;
-        }
+        .data-table td:last-child { text-align: right; color: var(--accent); font-weight: 600; }
 
         .bar-inline {
-            display: inline-block;
-            height: 3px;
-            background: var(--accent);
-            border-radius: 2px;
-            opacity: 0.35;
-            margin-right: 0.5rem;
-            vertical-align: middle;
+            display: inline-block; height: 3px;
+            background: var(--accent); border-radius: 2px;
+            opacity: 0.35; margin-right: 0.5rem; vertical-align: middle;
         }
 
-        /* =====================================================
-           PROJECTS TABLE
-        ===================================================== */
-        .projects-section {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-        }
+        /* PROJECTS TABLE */
+        .projects-section { margin-bottom: 2rem; padding: 1.5rem; }
 
         .projects-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 1.25rem;
         }
 
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            text-decoration: none;
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-sm);
-            letter-spacing: 0.04em;
-            transition: opacity 0.2s, transform 0.15s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover { opacity: 0.87; transform: translateY(-1px); }
-
-        .projects-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
+        .projects-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 
         .projects-table th {
-            font-family: var(--font-mono);
-            font-size: 0.62rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            text-align: left;
-            padding: 0 0 0.75rem;
-            border-bottom: 1px solid var(--table-border);
+            font-family: var(--font-mono); font-size: 0.62rem;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--text-muted); text-align: left;
+            padding: 0 0 0.75rem; border-bottom: 1px solid var(--table-border);
         }
 
         .projects-table td {
-            padding: 0.9rem 0;
-            border-bottom: 1px solid var(--table-border);
+            padding: 0.9rem 0; border-bottom: 1px solid var(--table-border);
             vertical-align: middle;
         }
 
         .projects-table tr:last-child td { border-bottom: none; }
-
         .project-title-cell { font-weight: 600; }
 
         .tech-pill {
-            font-family: var(--font-mono);
-            font-size: 0.62rem;
-            background: var(--accent-light);
-            border: 1px solid rgba(37,99,235,0.2);
-            border-radius: 4px;
-            padding: 0.2rem 0.5rem;
-            color: var(--accent);
+            font-family: var(--font-mono); font-size: 0.62rem;
+            background: var(--accent-light); border: 1px solid rgba(37,99,235,0.2);
+            border-radius: 4px; padding: 0.2rem 0.5rem; color: var(--accent);
         }
 
-        .action-links {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
+        .action-links { display: flex; gap: 0.75rem; justify-content: flex-end; }
 
-        .action-links a,
-        .action-links button {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--text-muted2);
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
+        .action-links a, .action-links button {
+            font-family: var(--font-mono); font-size: 0.7rem;
+            color: var(--text-muted2); text-decoration: none;
+            background: none; border: none; cursor: pointer; padding: 0;
             transition: color var(--transition);
         }
 
         .action-links a:hover { color: var(--accent); }
         .action-links button:hover { color: var(--accent3); }
 
-        /* =====================================================
-           FLASH & EMPTY
-        ===================================================== */
-        .flash {
-            background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.25);
-            border-radius: var(--radius-sm);
-            color: var(--accent2);
-            font-family: var(--font-mono);
-            font-size: 0.78rem;
-            padding: 0.65rem 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .empty-state {
-            font-family: var(--font-mono);
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            text-align: center;
-            padding: 2rem 0;
-        }
-
-        /* Unread badge */
-        .unread-badge {
-            display: inline-block;
-            background: var(--accent);
-            color: #fff;
-            font-family: var(--font-mono);
-            font-size: 0.58rem;
-            padding: 0.15rem 0.45rem;
-            border-radius: 999px;
-            margin-left: 0.4rem;
-            vertical-align: middle;
-        }
-
-        /* Messages stat card clickable */
-        .stat-card.clickable { cursor: pointer; }
-        .stat-card.clickable:hover { border-color: var(--accent); }
-
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
         @media (max-width: 600px) {
             .topbar { padding: 0 1rem; }
             .page { padding: 1.5rem 1rem 4rem; }
@@ -485,7 +159,6 @@
 </head>
 <body>
 
-<!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-brand">
         <span class="live-dot"></span>
@@ -505,14 +178,11 @@
 <main class="page">
 
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-            <div class="flash">✓ {{ msg }}</div>
-            {% endfor %}
-        {% endif %}
+        {% if messages %}{% for msg in messages %}
+        <div class="flash">✓ {{ msg }}</div>
+        {% endfor %}{% endif %}
     {% endwith %}
 
-    <!-- ESTADÍSTICAS -->
     <p class="section-label">Estadísticas · últimos 30 días</p>
 
     <div class="stats-grid">
@@ -549,7 +219,6 @@
         </div>
     </div>
 
-    <!-- GRÁFICOS -->
     <div class="charts-grid">
         <div class="card chart-card">
             <div class="chart-title">Visitantes únicos · últimos 14 días</div>
@@ -561,7 +230,6 @@
         </div>
     </div>
 
-    <!-- TABLAS DETALLE -->
     <div class="tables-grid">
         <div class="card table-card">
             <div class="chart-title">Visitas por página</div>
@@ -607,7 +275,6 @@
         </div>
     </div>
 
-    <!-- PROYECTOS -->
     <div class="card projects-section">
         <div class="projects-header">
             <p class="section-label" style="margin:0;border:none;">Gestión de proyectos</p>
@@ -651,17 +318,14 @@
 
 </main>
 
-<!-- CHARTS JS -->
 <script>
-    // Lee el tema actual para configurar los colores de los gráficos
     function getChartColors() {
         const dark = document.documentElement.getAttribute('data-theme') === 'dark';
         return {
-            accent:  '#2563eb',
-            green:   '#10b981',
-            grid:    dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)',
-            text:    dark ? '#475569' : '#94a3b8',
-            bg:      dark ? 'rgba(37,99,235,0.08)' : 'rgba(37,99,235,0.06)',
+            accent: '#2563eb', green: '#10b981',
+            grid: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)',
+            text: dark ? '#475569' : '#94a3b8',
+            bg:   dark ? 'rgba(37,99,235,0.08)' : 'rgba(37,99,235,0.06)',
         };
     }
 
@@ -679,22 +343,13 @@
         if (dailyChart) dailyChart.destroy();
         dailyChart = new Chart(document.getElementById('dailyChart'), {
             type: 'line',
-            data: {
-                labels: dailyLabels,
-                datasets: [{
-                    data: dailyData,
-                    borderColor: c.accent,
-                    backgroundColor: c.bg,
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    pointBackgroundColor: c.accent,
-                    tension: 0.4,
-                    fill: true,
-                }]
-            },
+            data: { labels: dailyLabels, datasets: [{
+                data: dailyData, borderColor: c.accent, backgroundColor: c.bg,
+                borderWidth: 2, pointRadius: 3, pointBackgroundColor: c.accent,
+                tension: 0.4, fill: true,
+            }]},
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { grid: { color: c.grid }, ticks: { maxRotation: 0, color: c.text } },
@@ -709,21 +364,13 @@
         if (deviceChart) deviceChart.destroy();
         deviceChart = new Chart(document.getElementById('deviceChart'), {
             type: 'doughnut',
-            data: {
-                labels: deviceLabels,
-                datasets: [{
-                    data: deviceData,
-                    backgroundColor: [c.accent, c.green, '#ef4444'],
-                    borderWidth: 0,
-                    hoverOffset: 6,
-                }]
-            },
+            data: { labels: deviceLabels, datasets: [{
+                data: deviceData, backgroundColor: [c.accent, c.green, '#ef4444'],
+                borderWidth: 0, hoverOffset: 6,
+            }]},
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { padding: 16, boxWidth: 10, color: c.text } }
-                },
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 10, color: c.text } } },
                 cutout: '65%',
             }
         });
@@ -731,25 +378,18 @@
 
     buildCharts();
 
-    // =====================================================
-    // THEME TOGGLE
-    // =====================================================
-    const html        = document.documentElement;
-    const toggleBtn   = document.getElementById('themeToggle');
-    const STORAGE_KEY = 'panel-theme';
-
-    // Cargamos la preferencia guardada (por defecto dark)
-    const saved = localStorage.getItem(STORAGE_KEY) || 'dark';
+    const html      = document.documentElement;
+    const toggleBtn = document.getElementById('themeToggle');
+    const KEY       = 'panel-theme';
+    const saved     = localStorage.getItem(KEY) || 'dark';
     html.setAttribute('data-theme', saved);
     toggleBtn.textContent = saved === 'dark' ? '☀' : '🌙';
 
     toggleBtn.addEventListener('click', () => {
-        const current = html.getAttribute('data-theme');
-        const next    = current === 'dark' ? 'light' : 'dark';
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', next);
-        localStorage.setItem(STORAGE_KEY, next);
+        localStorage.setItem(KEY, next);
         toggleBtn.textContent = next === 'dark' ? '☀' : '🌙';
-        // Reconstruimos los gráficos con los colores del nuevo tema
         buildCharts();
     });
 </script>
